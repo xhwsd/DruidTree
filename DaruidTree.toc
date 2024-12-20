@@ -1,0 +1,14 @@
+## Interface: 11200
+## Title: DaruidTree 树德
+## Title-zhCN: |CFF33AAFF[德鲁伊]|R树德辅助插件
+## Notes-zhCN: 适配乌龟服的树德辅助插件
+## Author: xhwsd@qq.com
+## Version: 1.1.2
+## Dependencies: !Libs
+
+Libs\EffectLib-1.0\EffectLib-1.0.lua
+Libs\SlotLib-1.0\SlotLib-1.0.lua 
+Libs\SpellLib-1.0\SpellLib-1.0.lua 
+Libs\TargettLib-1.0\TargettLib-1.0.lua 
+
+DaruidTree.lua
