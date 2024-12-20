@@ -264,7 +264,7 @@ function DaruidTree:CanHeal(unit)
 	end
 
 	-- 法术范围内（40码）
-	local slot = slotLib::FindSpell("愈合", "回春术", "治疗之触")
+	local slot = slotLib:FindSpell("愈合", "回春术", "治疗之触")
 	if slot and targetLib:ToUnit(unit) then
 		local satisfy = IsActionInRange(slot) == 1
 		targetLib:ToLast()

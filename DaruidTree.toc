@@ -9,6 +9,6 @@
 Libs\EffectLib-1.0\EffectLib-1.0.lua
 Libs\SlotLib-1.0\SlotLib-1.0.lua 
 Libs\SpellLib-1.0\SpellLib-1.0.lua 
-Libs\TargettLib-1.0\TargettLib-1.0.lua 
+Libs\TargetLib-1.0\TargetLib-1.0.lua 
 
 DaruidTree.lua
