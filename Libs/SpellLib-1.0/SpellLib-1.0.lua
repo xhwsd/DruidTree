@@ -63,7 +63,9 @@ end
 -- @param string spell 法术名称
 -- @return boolean 已就绪返回true，否则返回false
 function SpellLib:IsReady(spell)
-	if not spell then return false end
+	if not spell then 
+		return false
+	end
 
 	-- 名称到索引
 	local index = 1
@@ -102,5 +104,5 @@ end
 ------------------------------------------------
 
 -- 最终注册库
-AceLibrary:Register(SpellLib, MAJOR_VERSION, MINOR_VERSION, activate, external)
+AceLibrary:Register(SpellLib, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
 SpellLib = nil

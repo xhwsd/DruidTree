@@ -173,5 +173,5 @@ end
 ------------------------------------------------
 
 -- 最终注册库
-AceLibrary:Register(TargetLib, MAJOR_VERSION, MINOR_VERSION, activate, external)
+AceLibrary:Register(TargetLib, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
 TargetLib = nil

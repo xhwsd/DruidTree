@@ -116,5 +116,5 @@ end
 ------------------------------------------------
 
 -- 最终注册库
-AceLibrary:Register(EffectLib, MAJOR_VERSION, MINOR_VERSION, activate, external)
+AceLibrary:Register(EffectLib, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
 EffectLib = nil

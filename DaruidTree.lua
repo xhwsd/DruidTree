@@ -9,13 +9,19 @@ DaruidTree = AceLibrary("AceAddon-2.0"):new(
 	-- 控制台
 	"AceConsole-2.0",
 	-- 调试
-	"AceDebug-2.0"
+	"AceDebug-2.0",
+	-- 事件
+	"AceEvent-2.0",
+	-- 钩子
+	"AceHook-2.1"
 )
 
--- 施法库
-local castLib = AceLibrary("CastLib-1.0") 
 -- 名单库（团队/队伍）
 local rosterLib = AceLibrary("RosterLib-2.0")
+-- 法术缓存
+local spellCache = AceLibrary("SpellCache-1.0")
+-- 提示解析
+local gratuity = AceLibrary("Gratuity-2.0")
 
 -- 效果库
 local effectLib = AceLibrary("EffectLib-1.0")
@@ -26,8 +32,17 @@ local slotLib = AceLibrary("SlotLib-1.0")
 -- 目标库
 local targetLib = AceLibrary("TargetLib-1.0")
 
--- 名单名称
-local rosterNames = {}
+-- 名单
+local rosters = {}
+-- 施法
+local cast = {
+	-- 法术
+	spell = "",
+	-- 目标
+	target = "",
+	-- 施法中
+	casting = false,
+}
 
 -- 位与数组
 -- @param table array 数组(索引表）
@@ -49,8 +64,10 @@ end
 -- @return number 生命损失
 local function HealthLose(unit)
 	unit = unit or "player"
-
+	
+	-- 生命上限
 	local max = UnitHealthMax(unit)
+	-- 生命损失
 	local lose = max - UnitHealth(unit)
 	-- 百分比 = 部分 / 整体 * 100
 	return math.floor(lose / max * 100), lose
@@ -63,6 +80,7 @@ end
 local function HealthResidual(unit)
 	unit = unit or "player"
 
+	-- 生命剩余
 	local residual = UnitHealth(unit)
 	-- 百分比 = 部分 / 整体 * 100
 	return math.floor(residual / UnitHealthMax(unit) * 100), residual
@@ -131,7 +149,7 @@ local function CastHint(spell, unit)
 	if unit then
 		if UnitIsPlayer(unit) then
 			-- 自我施法
-			CastSpellByName(spell, true)
+			CastSpellByName(spell, 1)
 			UIErrorsFrame:AddMessage(string.format("对自己施放<%s>", spell), 0.0, 1.0, 0.0, 53, 5)
 		elseif targetLib:ToUnit(unit) then
 			-- 目标施法
@@ -148,36 +166,147 @@ end
 
 -- 插件载入
 function DaruidTree:OnInitialize()
-	-- 自定义标题，以便调试输出
-	self.title = "SD"
+	-- 精简标题
+	self.title = "树德辅助"
 	-- 开启调试
 	self:SetDebugging(true)
-	-- 输出1~2级调试
-	self:SetDebugLevel(2)
-
-	-- 注册命令
-	self:RegisterChatCommand({'/DaruidTree', "/SD"}, {
-		type = "group",
-		args = {
-			level = {
-				name = "level",
-				desc = "调试等级",
-				type = "toggle",
-				get = "GetDebugLevel",
-				set = "SetDebugLevel",
-			}
-		},
-	})
+	-- 调试等级
+	self:SetDebugLevel(3)
 end
 
 -- 插件打开
 function DaruidTree:OnEnable()
+	self:LevelDebug(3, "插件打开")
 
+	-- 注册命令
+	self:RegisterChatCommand({"/SDFZ", '/DaruidTree'}, {
+		type = "group",
+		args = {
+			tsms = {
+				name = "调试模式",
+				desc = "开启或关闭调试模式",
+				type = "toggle",
+				get = "IsDebugging",
+				set = "SetDebugging"
+			},
+			tsdj = {
+				name = "调试等级",
+				desc = "设置或获取调试等级",
+				type = "range",
+				min = 1,
+				max = 3,
+				get = "GetDebugLevel",
+				set = "SetDebugLevel"
+			}
+		},
+	})
+
+	-- 注册事件
+	self:RegisterEvent("SPELLCAST_START")
+	self:RegisterEvent("SPELLCAST_STOP")
+	self:RegisterEvent("SPELLCAST_FAILED")
+	self:RegisterEvent("SPELLCAST_INTERRUPTED", "SPELLCAST_FAILED")
+
+	-- 挂接函数
+	self:Hook("UseAction")
+	self:Hook("CastSpell")
+	self:Hook("CastSpellByName")
+	-- self:Hook("SpellTargetUnit")
+	-- self:Hook("SpellStopTargeting")
+	-- self:Hook("TargetUnit")
+	-- self:HookScript(WorldFrame, "OnMouseDown")
 end
 
 -- 插件关闭
 function DaruidTree:OnDisable()
+	self:LevelDebug(3, "插件关闭")
+end
 
+-- 施法开始
+function DaruidTree:SPELLCAST_START()
+	cast.casting = true
+	cast.spell = arg1
+	-- self:LevelDebug(3, "施法开始；法术：%s；目标：%s", cast.spell, cast.target)
+end
+
+-- 施法停止
+function DaruidTree:SPELLCAST_STOP()
+	cast.casting = false
+	-- self:LevelDebug(3, "施法停止；法术：%s；目标：%s", cast.spell, cast.target)
+end
+
+-- 施法失败
+function DaruidTree:SPELLCAST_FAILED()
+	cast.casting = false
+	-- self:LevelDebug(3, "施法失败；法术：%s；目标：%s", cast.spell, cast.target)
+end
+
+-- 使用动作条
+function DaruidTree:UseAction(slotId, checkCursor, onSelf)
+	-- self:LevelDebug(3, "UseAction", slotId, checkCursor, onSelf)
+	self.hooks.UseAction(slotId, checkCursor, onSelf)
+
+	-- 宏有文本
+	if GetActionText(slotId) then
+		return
+	end
+
+	-- 法术名称
+	gratuity:SetAction(slotId)
+	cast.spell = spellCache:GetSpellData(gratuity:GetLine(1), gratuity:GetLine(1, true))
+	
+	-- 目标名称
+	if onSelf then
+		cast.target = UnitName("player")
+	elseif UnitExists("target") then
+		cast.target = UnitName("target")
+	else
+		cast.target = UnitName("player")
+	end
+end
+
+-- 施展法术
+function DaruidTree:CastSpell(spellId, spellbookType)
+	-- self:LevelDebug(3, "CastSpell", spellId, spellbookType)
+	self.hooks.CastSpell(spellId, spellbookType)
+
+	-- 正在施法
+	if cast.casting then
+		return
+	end
+
+	-- 法术名称
+	cast.spell = GetSpellName(spellId, spellbookType)
+
+	-- 目标名称
+	if UnitName("target") then
+		cast.target = UnitName("target") 
+	else
+		cast.target = UnitName("player")
+	end
+end
+
+-- 按名称施展法术
+function DaruidTree:CastSpellByName(spellName, onSelf)
+	-- self:LevelDebug(3, "CastSpellByName", spellName, onSelf)
+	self.hooks.CastSpellByName(spellName, onSelf)
+
+	-- 正在施法
+	if cast.casting then
+		return
+	end
+
+	-- 法术名称
+	cast.spell = spellCache:GetSpellData(spellName)
+
+	-- 目标名称
+	if onSelf then
+		cast.target = UnitName("player")
+	elseif UnitExists("target") then
+		cast.target = UnitName("target")
+	else
+		cast.target = UnitName("player")
+	end
 end
 
 -- 打断治疗
@@ -187,32 +316,28 @@ function DaruidTree:StopHeal(start)
 	start = start or 0
 
 	-- 正在施法中
-	if castLib.isCasting then
+	if cast.casting then
 		-- 匹配法术
-		local spell, target = castLib.SpellCast[1], castLib.SpellCast[3]
-		if InArray({"愈合", "治疗之触"}, spell) then
+		if InArray({"愈合", "治疗之触"}, cast.spell) then
 			-- 取生命损失
-			local lose, player = 0, false
-			if target == UnitName("player") then
+			local lose = 0
+			if cast.target == UnitName("player") then
 				-- 自己
 				lose = HealthLose("player")
-				player = true
 			else
-				local unit = rosterLib:GetUnitIDFromName(target)
+				local unit = rosterLib:GetUnitIDFromName(cast.target)
 				if unit then
 					-- 单位
 					lose = HealthLose(unit)
-					player = UnitIsPlayer(unit)
-				elseif targetLib:ToName(target) then
+				elseif targetLib:ToName(cast.target) then
 					-- 名称
 					lose = HealthLose("target")
-					player = UnitIsPlayer("target")
 					targetLib:ToLast()
 				end
 			end
 			
-			self:LevelDebug(3, "打断治疗；法术：%s；目标：%s；起始：%d；损失：%d", spell, target, start, lose)
-			if lose <= start and player then
+			if lose <= start then
+				self:LevelDebug(3, "打断治疗；法术：%s；目标：%s；起始：%d；损失：%d", cast.spell, cast.target, start, lose)
 				-- 测试发现对NPC愈合时无法真正打断 xhwsd@qq.com 2024-11-15
 				SpellStopCasting()
 				return true
@@ -430,7 +555,7 @@ function DaruidTree:FindRoster(start)
 
 	-- 名单查找
 	local max, target = 0
-	for _, name in ipairs(rosterNames) do
+	for _, name in ipairs(rosters) do
 		local unit = rosterLib:GetUnitIDFromName(name)
 		if unit then
 			-- 单位匹配
@@ -461,7 +586,7 @@ function DaruidTree:AddedBuff(buff, spell)
 
 	-- 名单查找
 	local target
-	for _, name in ipairs(rosterNames) do
+	for _, name in ipairs(rosters) do
 		local unit = rosterLib:GetUnitIDFromName(name)
 		if unit then
 			if not effectLib:FindName(buff, unit) and self:CanHeal(unit) then
@@ -609,33 +734,33 @@ end
 function DaruidTree:Roster()
 	if IsAltKeyDown() then
 		-- 名单清空
-		rosterNames = {}
+		rosters = {}
 		print("名单：已清空！")
 	elseif UnitIsFriend("player", "target") then
 		-- 名单增删
 		-- 增删名称
 		local name = UnitName("target")
-		local index = InArray(rosterNames, name)
+		local index = InArray(rosters, name)
 		if index then
-			table.remove(rosterNames, index)
+			table.remove(rosters, index)
 			print(string.format(
 				"已将<%s>移出名单：%s",
 				name,
-				next(rosterNames) and table.concat(rosterNames, "；") or "空的！"
+				next(rosters) and table.concat(rosters, "；") or "空的！"
 			))
 		else
-			table.insert(rosterNames, 1, name)
+			table.insert(rosters, 1, name)
 			print(string.format(
 				"已将<%s>加入名单：%s",
 				name,
-				table.concat(rosterNames, "；")
+				table.concat(rosters, "；")
 			))
 		end
 	else
 		-- 名单列出
 		print(string.format(
 			"名单：%s",
-			next(rosterNames) and table.concat(rosterNames, "；") or "空的！"
+			next(rosters) and table.concat(rosters, "；") or "空的！"
 		))
 	end
 end

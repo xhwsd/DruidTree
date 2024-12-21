@@ -196,5 +196,5 @@ end
 ------------------------------------------------
 
 -- 最终注册库
-AceLibrary:Register(SlotLib, MAJOR_VERSION, MINOR_VERSION, activate, external)
+AceLibrary:Register(SlotLib, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
 SlotLib = nil
