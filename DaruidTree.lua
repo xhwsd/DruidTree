@@ -171,7 +171,7 @@ function DaruidTree:OnInitialize()
 	-- 开启调试
 	self:SetDebugging(true)
 	-- 调试等级
-	self:SetDebugLevel(3)
+	self:SetDebugLevel(2)
 end
 
 -- 插件打开
