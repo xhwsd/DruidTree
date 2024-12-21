@@ -144,10 +144,10 @@ local function CastHint(spell, unit)
 	if not spell or spell == "" then
 		return
 	end
-
+	
 	-- 指定单位
 	if unit then
-		if UnitIsPlayer(unit) then
+		if UnitIsUnit(unit, "player") then
 			-- 自我施法
 			CastSpellByName(spell, 1)
 			UIErrorsFrame:AddMessage(string.format("对自己施放<%s>", spell), 0.0, 1.0, 0.0, 53, 5)
@@ -578,10 +578,11 @@ function DaruidTree:FindRoster(start)
 end
 
 -- 补充名单增益
--- @param string buff 增益名称
+-- @param string buff = "回春术" 增益名称
 -- @param string spell = buff 法术名称
 -- @return string|nil 已补返回名称，未补返回nil
 function DaruidTree:AddedBuff(buff, spell)
+	buff = buff or "回春术"
 	spell = spell or buff
 
 	-- 名单查找
@@ -606,7 +607,7 @@ function DaruidTree:AddedBuff(buff, spell)
 
 	-- 补充增益
 	if target and targetLib:ToName(target) then
-		self:LevelDebug(3, "补充名单增益；目标：%s；法术：%s", target, spell)   
+		self:LevelDebug(3, "补充名单增益；目标：%s；法术：%s", UnitName("target"), spell)   
 		CastHint(spell, "target")
 		targetLib:ToLast()
 	end
@@ -698,7 +699,7 @@ function DaruidTree:HealRoster(start)
 	end
 
 	-- 补充名单增益
-	if self:AddedBuff("回春术") then
+	if self:AddedBuff() then
 		return true
 	end
 
