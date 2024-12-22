@@ -1,14 +1,14 @@
 --[[
-Name: SpellLib-1.0
+Name: SpellCheck-1.0
 Revision: $Rev: 10001 $
 Author(s): xhwsd
 Website: https://github.com/xhwsd
-Description: 法术相关操作库。
+Description: 法术检测相关操作库。
 Dependencies: AceLibrary, SpellCache-1.0
 ]]
 
 -- 主要版本
-local MAJOR_VERSION = "SpellLib-1.0"
+local MAJOR_VERSION = "SpellCheck-1.0"
 --次要版本
 local MINOR_VERSION = "$Revision: 10001 $"
 
@@ -39,7 +39,7 @@ CheckDependency({
 local spellCache = AceLibrary("SpellCache-1.0")
 
 -- 创建库对象
-local SpellLib = {}
+local SpellCheck = {}
 
 -- 库激活
 -- @param table self 库自身对象
@@ -62,7 +62,7 @@ end
 -- 检验法术的冷却时间是否结束
 -- @param string spell 法术名称
 -- @return boolean 已就绪返回true，否则返回false
-function SpellLib:IsReady(spell)
+function SpellCheck:IsReady(spell)
 	if not spell then 
 		return false
 	end
@@ -93,7 +93,7 @@ end
 -- @return string 法术名称
 -- @return number 法术等级
 -- @return number 法术索引；从1开始
-function SpellLib:parseText(text)
+function SpellCheck:parseText(text)
 	if text then
 		-- 取法术数据
 		local sName, _, sId, _, sRank = spellCache:GetSpellData(text, nil)
@@ -104,5 +104,5 @@ end
 ------------------------------------------------
 
 -- 最终注册库
-AceLibrary:Register(SpellLib, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
-SpellLib = nil
+AceLibrary:Register(SpellCheck, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
+SpellCheck = nil

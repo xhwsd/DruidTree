@@ -6,9 +6,10 @@
 ## Version: 1.1.2
 ## Dependencies: !Libs
 
-Libs\EffectLib-1.0\EffectLib-1.0.lua
-Libs\SlotLib-1.0\SlotLib-1.0.lua 
-Libs\SpellLib-1.0\SpellLib-1.0.lua 
-Libs\TargetLib-1.0\TargetLib-1.0.lua 
+Libs\EffectCheck-1.0\EffectCheck-1.0.lua
+Libs\SpellCheck-1.0\SpellCheck-1.0.lua 
+Libs\SpellSlot-1.0\SpellSlot-1.0.lua 
+Libs\TargetSwitch-1.0\TargetSwitch-1.0.lua
+Libs\CastStatus-1.0\CastStatus-1.0.lua 
 
 DaruidTree.lua

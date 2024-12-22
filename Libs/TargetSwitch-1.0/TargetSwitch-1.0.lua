@@ -1,14 +1,14 @@
 --[[
-Name: TargetLib-1.0
+Name: TargetSwitch-1.0
 Revision: $Rev: 10220 $
 Author(s): xhwsd
 Website: https://github.com/xhwsd
-Description: 目标相关操作库。
+Description: 目标切换相关操作库。
 Dependencies: AceLibrary
 ]]
 
 -- 主要版本
-local MAJOR_VERSION = "TargetLib-1.0"
+local MAJOR_VERSION = "TargetSwitch-1.0"
 --次要版本
 local MINOR_VERSION = "$Revision: 10220 $"
 
@@ -23,7 +23,7 @@ if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
 end
 
 -- 创建库对象
-local TargetLib = {}
+local TargetSwitch = {}
 
 -- 库激活
 -- @param table self 库自身对象
@@ -49,7 +49,7 @@ local switchTargets = {}
 -- 切换到单位目标
 -- @param string unit 单位
 -- @return boolean 切换到单位成功
-function TargetLib:ToUnit(unit)
+function TargetSwitch:ToUnit(unit)
 	if not unit or unit == "" then
 		-- DebugError(1, "切换到单位目标无效：单位：%s", unit or "nil")
 		return false
@@ -95,7 +95,7 @@ end
 -- 切换到名称目标
 -- @param string name 名称
 -- @return boolean 成功返回true，否则返回false
-function TargetLib:ToName(name)
+function TargetSwitch:ToName(name)
 	if not name or name == "" then
 		-- DebugError(1, "切换到名称目标无效；名称：%s", name or "nil")
 		return false
@@ -138,7 +138,7 @@ end
 
 -- 恢复到上次目标
 -- @return boolean 成功返回true，否则返回false
-function TargetLib:ToLast()
+function TargetSwitch:ToLast()
 	if next(switchTargets) == nil then
 		-- DebugWarning(2, "切换目标列表为空")
 		return false
@@ -173,5 +173,5 @@ end
 ------------------------------------------------
 
 -- 最终注册库
-AceLibrary:Register(TargetLib, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
-TargetLib = nil
+AceLibrary:Register(TargetSwitch, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
+TargetSwitch = nil

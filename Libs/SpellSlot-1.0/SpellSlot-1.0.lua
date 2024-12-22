@@ -1,14 +1,14 @@
 --[[
-Name: SlotLib-1.0
+Name: SpellSlot-1.0
 Revision: $Rev: 10001 $
 Author(s): xhwsd
 Website: https://github.com/xhwsd
-Description: 插槽相关操作库。
+Description: 法术插槽相关操作库。
 Dependencies: AceLibrary, Gratuity-2.0, SpellCache-1.0
 ]]
 
 -- 主要版本
-local MAJOR_VERSION = "SlotLib-1.0"
+local MAJOR_VERSION = "SpellSlot-1.0"
 --次要版本
 local MINOR_VERSION = "$Revision: 10001 $"
 
@@ -42,7 +42,7 @@ local gratuity = AceLibrary("Gratuity-2.0")
 local spellCache = AceLibrary("SpellCache-1.0")
 
 -- 创建库对象
-local SlotLib = {}
+local SpellSlot = {}
 
 -- 库激活
 -- @param table self 库自身对象
@@ -92,14 +92,14 @@ end
 -- 检验插槽是否为宏
 -- @param number slot 插槽索引；从1开始
 -- @return boolean 是否为宏
-function SlotLib:IsMacro(slot)
+function SpellSlot:IsMacro(slot)
 	return slot and HasAction(slot) and GetActionText(slot) ~= nil
 end
 
 -- 检验插槽是否法术（非宏）
 -- @param number slot 插槽索引；从1开始
 -- @return boolean 是否为法术
-function SlotLib:IsSpell(slot)
+function SpellSlot:IsSpell(slot)
 	return slot and HasAction(slot) and not GetActionText(slot)
 end
 
@@ -108,7 +108,7 @@ end
 -- @return string 法术名称
 -- @return number 法术等级
 -- @return number 法术索引；从1开始
-function SlotLib:GetSpell(slot)
+function SpellSlot:GetSpell(slot)
 	-- 仅限法术插槽
 	if self:IsSpell(slot) then
 		-- 取提示文本
@@ -126,7 +126,7 @@ end
 -- @return number 插槽索引；1~120
 -- @return sting 法术名称
 -- @return sting 图标纹理
-function SlotLib:FindSpell(...)
+function SpellSlot:FindSpell(...)
 	-- 检验法术
 	if arg.n == 0 then
 		return
@@ -196,5 +196,5 @@ end
 ------------------------------------------------
 
 -- 最终注册库
-AceLibrary:Register(SlotLib, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
-SlotLib = nil
+AceLibrary:Register(SpellSlot, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
+SpellSlot = nil

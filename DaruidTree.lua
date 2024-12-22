@@ -9,40 +9,27 @@ DaruidTree = AceLibrary("AceAddon-2.0"):new(
 	-- 控制台
 	"AceConsole-2.0",
 	-- 调试
-	"AceDebug-2.0",
-	-- 事件
-	"AceEvent-2.0",
-	-- 钩子
-	"AceHook-2.1"
+	"AceDebug-2.0"
 )
 
 -- 名单库（团队/队伍）
 local rosterLib = AceLibrary("RosterLib-2.0")
 -- 法术缓存
 local spellCache = AceLibrary("SpellCache-1.0")
--- 提示解析
-local gratuity = AceLibrary("Gratuity-2.0")
 
--- 效果库
-local effectLib = AceLibrary("EffectLib-1.0")
--- 法术库
-local spellLib = AceLibrary("SpellLib-1.0")
--- 插槽库
-local slotLib = AceLibrary("SlotLib-1.0")
--- 目标库
-local targetLib = AceLibrary("TargetLib-1.0")
+-- 效果检查
+local effectCheck = AceLibrary("EffectCheck-1.0")
+-- 法术检查
+local spellCheck = AceLibrary("SpellCheck-1.0")
+-- 法术插槽
+local spellSlot = AceLibrary("SpellSlot-1.0")
+-- 目标切换
+local targetSwitch = AceLibrary("TargetSwitch-1.0")
+-- 施法状态
+local castStatus = AceLibrary("CastStatus-1.0")
 
 -- 名单
 local rosters = {}
--- 施法
-local cast = {
-	-- 法术
-	spell = "",
-	-- 目标
-	target = "",
-	-- 施法中
-	casting = false,
-}
 
 -- 位与数组
 -- @param table array 数组(索引表）
@@ -151,10 +138,10 @@ local function CastHint(spell, unit)
 			-- 自我施法
 			CastSpellByName(spell, 1)
 			UIErrorsFrame:AddMessage(string.format("对自己施放<%s>", spell), 0.0, 1.0, 0.0, 53, 5)
-		elseif targetLib:ToUnit(unit) then
+		elseif targetSwitch:ToUnit(unit) then
 			-- 目标施法
 			CastSpellByName(spell)
-			targetLib:ToLast()
+			targetSwitch:ToLast()
 			UIErrorsFrame:AddMessage(string.format("对<%s>施放<%s>", UnitName(unit), spell), 0.0, 1.0, 0.0, 53, 5)
 		end
 	else
@@ -200,21 +187,6 @@ function DaruidTree:OnEnable()
 			}
 		},
 	})
-
-	-- 注册事件
-	self:RegisterEvent("SPELLCAST_START")
-	self:RegisterEvent("SPELLCAST_STOP")
-	self:RegisterEvent("SPELLCAST_FAILED")
-	self:RegisterEvent("SPELLCAST_INTERRUPTED", "SPELLCAST_FAILED")
-
-	-- 挂接函数
-	self:Hook("UseAction")
-	self:Hook("CastSpell")
-	self:Hook("CastSpellByName")
-	-- self:Hook("SpellTargetUnit")
-	-- self:Hook("SpellStopTargeting")
-	-- self:Hook("TargetUnit")
-	-- self:HookScript(WorldFrame, "OnMouseDown")
 end
 
 -- 插件关闭
@@ -222,122 +194,36 @@ function DaruidTree:OnDisable()
 	self:LevelDebug(3, "插件关闭")
 end
 
--- 施法开始
-function DaruidTree:SPELLCAST_START()
-	cast.casting = true
-	cast.spell = arg1
-	-- self:LevelDebug(3, "施法开始；法术：%s；目标：%s", cast.spell, cast.target)
-end
-
--- 施法停止
-function DaruidTree:SPELLCAST_STOP()
-	cast.casting = false
-	-- self:LevelDebug(3, "施法停止；法术：%s；目标：%s", cast.spell, cast.target)
-end
-
--- 施法失败
-function DaruidTree:SPELLCAST_FAILED()
-	cast.casting = false
-	-- self:LevelDebug(3, "施法失败；法术：%s；目标：%s", cast.spell, cast.target)
-end
-
--- 使用动作条
-function DaruidTree:UseAction(slotId, checkCursor, onSelf)
-	-- self:LevelDebug(3, "UseAction", slotId, checkCursor, onSelf)
-	self.hooks.UseAction(slotId, checkCursor, onSelf)
-
-	-- 宏有文本
-	if GetActionText(slotId) then
-		return
-	end
-
-	-- 法术名称
-	gratuity:SetAction(slotId)
-	cast.spell = spellCache:GetSpellData(gratuity:GetLine(1), gratuity:GetLine(1, true))
-	
-	-- 目标名称
-	if onSelf then
-		cast.target = UnitName("player")
-	elseif UnitExists("target") then
-		cast.target = UnitName("target")
-	else
-		cast.target = UnitName("player")
-	end
-end
-
--- 施展法术
-function DaruidTree:CastSpell(spellId, spellbookType)
-	-- self:LevelDebug(3, "CastSpell", spellId, spellbookType)
-	self.hooks.CastSpell(spellId, spellbookType)
-
-	-- 正在施法
-	if cast.casting then
-		return
-	end
-
-	-- 法术名称
-	cast.spell = GetSpellName(spellId, spellbookType)
-
-	-- 目标名称
-	if UnitName("target") then
-		cast.target = UnitName("target") 
-	else
-		cast.target = UnitName("player")
-	end
-end
-
--- 按名称施展法术
-function DaruidTree:CastSpellByName(spellName, onSelf)
-	-- self:LevelDebug(3, "CastSpellByName", spellName, onSelf)
-	self.hooks.CastSpellByName(spellName, onSelf)
-
-	-- 正在施法
-	if cast.casting then
-		return
-	end
-
-	-- 法术名称
-	cast.spell = spellCache:GetSpellData(spellName)
-
-	-- 目标名称
-	if onSelf then
-		cast.target = UnitName("player")
-	elseif UnitExists("target") then
-		cast.target = UnitName("target")
-	else
-		cast.target = UnitName("player")
-	end
-end
-
 -- 打断治疗
 -- @param number start = 0 起始生命损失百分比
 -- @param boolean 已打断返回true，未打断返回false
 function DaruidTree:StopHeal(start)
 	start = start or 0
-
+	
 	-- 正在施法中
-	if cast.casting then
+	local casting, spell, target = castStatus:GetStatus()
+	if casting then
 		-- 匹配法术
-		if InArray({"愈合", "治疗之触"}, cast.spell) then
+		if InArray({"愈合", "治疗之触"}, spell) then
 			-- 取生命损失
 			local lose = 0
-			if cast.target == UnitName("player") then
+			if target == UnitName("player") then
 				-- 自己
 				lose = HealthLose("player")
 			else
-				local unit = rosterLib:GetUnitIDFromName(cast.target)
+				local unit = rosterLib:GetUnitIDFromName(target)
 				if unit then
 					-- 单位
 					lose = HealthLose(unit)
-				elseif targetLib:ToName(cast.target) then
+				elseif targetSwitch:ToName(target) then
 					-- 名称
 					lose = HealthLose("target")
-					targetLib:ToLast()
+					targetSwitch:ToLast()
 				end
 			end
 			
 			if lose <= start then
-				self:LevelDebug(3, "打断治疗；法术：%s；目标：%s；起始：%d；损失：%d", cast.spell, cast.target, start, lose)
+				self:LevelDebug(3, "打断治疗；法术：%s；目标：%s；起始：%d；损失：%d", spell, target, start, lose)
 				-- 测试发现对NPC愈合时无法真正打断 xhwsd@qq.com 2024-11-15
 				SpellStopCasting()
 				return true
@@ -389,10 +275,10 @@ function DaruidTree:CanHeal(unit)
 	end
 
 	-- 法术范围内（40码）
-	local slot = slotLib:FindSpell("愈合", "回春术", "治疗之触")
-	if slot and targetLib:ToUnit(unit) then
+	local slot = spellSlot:FindSpell("愈合", "回春术", "治疗之触")
+	if slot and targetSwitch:ToUnit(unit) then
 		local satisfy = IsActionInRange(slot) == 1
-		targetLib:ToLast()
+		targetSwitch:ToLast()
 		return satisfy
 	end
 
@@ -415,13 +301,13 @@ function DaruidTree:OverdoseHeal(unit)
 	-- 过量治疗
 	local lose, health = HealthLose(unit)
 	self:LevelDebug(3, "过量治疗；目标：%s；损失：%d", UnitName(unit), lose)
-	if effectLib:FindName("自然迅捷") then
+	if effectCheck:FindName("自然迅捷") then
 		CastHint("愈合", unit)
-	elseif HealthResidual(unit) <= 40 and spellLib:IsReady("自然迅捷") then
+	elseif HealthResidual(unit) <= 40 and spellCheck:IsReady("自然迅捷") then
 		CastHint("自然迅捷")
-	elseif health >= 15000 and spellLib:IsReady("迅捷治愈") and (effectLib:FindName("愈合", unit) or effectLib:FindName("回春术", unit)) then
+	elseif health >= 15000 and spellCheck:IsReady("迅捷治愈") and (effectCheck:FindName("愈合", unit) or effectCheck:FindName("回春术", unit)) then
 		CastHint("迅捷治愈", unit)
-	elseif not effectLib:FindName("回春术", unit) then
+	elseif not effectCheck:FindName("回春术", unit) then
 		CastHint("回春术", unit)
 	else
 		CastHint("愈合", unit)
@@ -454,11 +340,11 @@ function DaruidTree:EconomizeHeal(unit, start, rank)
 
 	-- 节省治疗
 	self:LevelDebug(3, "节省治疗；目标：%s；起始：%d；损失：%d", UnitName(unit), start, lose)
-	if effectLib:FindName("自然迅捷", "player") then
+	if effectCheck:FindName("自然迅捷", "player") then
 		CastHint(AdaptRank("愈合", health, unit), unit)
-	elseif HealthResidual(unit) <= 40 and spellLib:IsReady("自然迅捷") then
+	elseif HealthResidual(unit) <= 40 and spellCheck:IsReady("自然迅捷") then
 		CastHint("自然迅捷")
-	elseif health >= 15000 and spellLib:IsReady("迅捷治愈") and (effectLib:FindName("愈合", unit) or effectLib:FindName("回春术", unit)) then
+	elseif health >= 15000 and spellCheck:IsReady("迅捷治愈") and (effectCheck:FindName("愈合", unit) or effectCheck:FindName("回春术", unit)) then
 		CastHint("迅捷治愈", unit)
 	else
 		CastHint(string.format("愈合(等级 %d)", rank), unit) 
@@ -487,13 +373,13 @@ function DaruidTree:EndeavorHeal(unit)
 
 	-- 尽力治疗
 	self:LevelDebug(3, "尽力治疗；目标：%s；损失：%d", UnitName(unit), lose)
-	if effectLib:FindName("自然迅捷", "player") then
+	if effectCheck:FindName("自然迅捷", "player") then
 		CastHint(AdaptRank("愈合", health, unit), unit)
-	elseif HealthResidual(unit) <= 40 and spellLib:IsReady("自然迅捷") then
+	elseif HealthResidual(unit) <= 40 and spellCheck:IsReady("自然迅捷") then
 		CastHint("自然迅捷")
-	elseif health >= 1500 and spellLib:IsReady("迅捷治愈") and (effectLib:FindName("愈合", unit) or effectLib:FindName("回春术", unit)) then
+	elseif health >= 1500 and spellCheck:IsReady("迅捷治愈") and (effectCheck:FindName("愈合", unit) or effectCheck:FindName("回春术", unit)) then
 		CastHint("迅捷治愈", unit)
-	elseif not effectLib:FindName("回春术", unit) then
+	elseif not effectCheck:FindName("回春术", unit) then
 		CastHint(AdaptRank("回春术", health, unit), unit)
 	else
 		CastHint(AdaptRank("愈合", health, unit), unit)
@@ -564,14 +450,14 @@ function DaruidTree:FindRoster(start)
 				max = lose
 				target = name
 			end
-		elseif targetLib:ToName(name) then
+		elseif targetSwitch:ToName(name) then
 			-- 名称匹配
 			local lose = HealthLose("target")
 			if lose >= start and lose > max and self:CanHeal("target") then
 				max = lose
 				target = name
 			end
-			targetLib:ToLast()
+			targetSwitch:ToLast()
 		end 
 	end
 	return target
@@ -590,26 +476,26 @@ function DaruidTree:AddedBuff(buff, spell)
 	for _, name in ipairs(rosters) do
 		local unit = rosterLib:GetUnitIDFromName(name)
 		if unit then
-			if not effectLib:FindName(buff, unit) and self:CanHeal(unit) then
+			if not effectCheck:FindName(buff, unit) and self:CanHeal(unit) then
 				target = name
 				break
 			end
-		elseif targetLib:ToName(name) then
-			if not effectLib:FindName(buff, "target") and self:CanHeal("target") then
-				targetLib:ToLast()
+		elseif targetSwitch:ToName(name) then
+			if not effectCheck:FindName(buff, "target") and self:CanHeal("target") then
+				targetSwitch:ToLast()
 				target = name
 				break
 			else
-				targetLib:ToLast()
+				targetSwitch:ToLast()
 			end
 		end
 	end
 
 	-- 补充增益
-	if target and targetLib:ToName(target) then
+	if target and targetSwitch:ToName(target) then
 		self:LevelDebug(3, "补充名单增益；目标：%s；法术：%s", UnitName("target"), spell)   
 		CastHint(spell, "target")
-		targetLib:ToLast()
+		targetSwitch:ToLast()
 	end
 	return target
 end
@@ -710,10 +596,10 @@ function DaruidTree:HealRoster(start)
 		if unit then
 			-- 尽力治疗单位
 			return self:EndeavorHeal(unit)
-		elseif targetLib:ToName(name) then
+		elseif targetSwitch:ToName(name) then
 			-- 尽力治疗目标
 			local result = self:EndeavorHeal("target")
-			targetLib:ToLast()
+			targetSwitch:ToLast()
 			return result
 		end
 	elseif UnitInRaid("player") then
@@ -772,7 +658,7 @@ function DaruidTree:EnergySaving()
 	SpellStopCasting()
 
 	-- 检验效果
-	if not effectLib:FindName("节能施法") then
+	if not effectCheck:FindName("节能施法") then
 		-- 检验目标
 		if UnitCanAttack("player", "target") and UnitAffectingCombat("target") then
 			-- 释放精灵之火
