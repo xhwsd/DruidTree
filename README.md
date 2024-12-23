@@ -11,7 +11,7 @@
 - 基于插件提供的函数，创建普通或超级宏
 - 将宏图标拖至动作条，然后使用宏
 
-> 请确保依赖插件最新版和已适配乌龟，插件目录名正确（如删除末尾`-main`等）
+> 确保插件最新版本、已适配乌龟服、目录名正确（如删除末尾`-main`等）
 
 
 ## 可用宏
@@ -39,11 +39,13 @@
 
 ```
 /script -- CastSpellByName("愈合")
-/script DaruidTree:HealParty(4)
+/script DaruidTree:HealParty(4, 40, 1500)
 ```
 
 参数列表：
 - `@param number start = 4` 起始生命损失百分比
+- `@param number swiftness = 40` 剩余生命等于或小于该百分比时，使用自然迅捷
+- `@param number swiftmend = 1500` 损失生命大于或等于该值时，使用迅捷治愈
 
 逻辑描述：
 - 检验打断施法（省蓝）
@@ -56,12 +58,14 @@
 
 ```
 /script -- CastSpellByName("愈合")
-/script DaruidTree:HealRaid(6, 4)
+/script DaruidTree:HealRaid(6, 4, 40, 1500)
 ```
 
 参数列表：
 - `@param number start = 6` 起始生命损失百分比
 - `@param number rank = 4` 愈合法术等级
+- `@param number swiftness = 40` 剩余生命等于或小于该百分比时，使用自然迅捷
+- `@param number swiftmend = 1500` 损失生命大于或等于该值时，使用迅捷治愈
 
 逻辑描述：
 - 检验打断施法（省蓝）
@@ -74,13 +78,15 @@
 
 ```
 /script -- CastSpellByName("愈合")
-/script DaruidTree:HealRoster(2)
+/script DaruidTree:HealRoster(2, 40, 1500)
 ```
 
 参数列表：
 - `@param number start = 2` 起始生命损失百分比
+- `@param number swiftness = 40` 剩余生命等于或小于该百分比时，使用自然迅捷
+- `@param number swiftmend = 1500` 损失生命大于或等于该值时，使用迅捷治愈
 
-逻辑描述：
+大致逻辑：
 - 检验打断施法（省蓝）
 - 补充名单回春术（毛治疗量）
 - 尽力治疗奶名中生命损失最多的目标
@@ -95,7 +101,7 @@
 /script DaruidTree:Roster()
 ```
 
-逻辑描述：
+大致逻辑：
 - 选择坦克（友善目标）使用宏 - 将目标加入或删除名单
 - 按住ALT使用宏 - 清空名单
 - 无目标、非友善目标使用宏 - 输出当前名单
@@ -110,7 +116,7 @@
 /script DaruidTree:EnergySaving()
 ```
 
-逻辑描述：
+大致逻辑：
 - 对附近进入战斗目标施法精灵之火（按下ALT释放最高级），以此触发节能效果
 
 
