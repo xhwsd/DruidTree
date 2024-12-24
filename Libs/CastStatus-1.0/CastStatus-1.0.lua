@@ -23,7 +23,7 @@ if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
 end
 
 ---检查依赖库
---- @param dependencies table 依赖库名称列表
+---@param dependencies table 依赖库名称列表
 local function CheckDependency(dependencies)
 	for index, value in ipairs(dependencies) do
 		if not AceLibrary:HasInstance(value) then 
