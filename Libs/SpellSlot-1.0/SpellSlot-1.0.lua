@@ -125,7 +125,7 @@ end
 
 -- 查找任意一个法术在动作条中的插槽索引
 ---@param ... string 法术名称
----@return number slot 插槽索引；1~120
+---@return integer slot 插槽索引；1~120
 ---@return string name 法术名称
 ---@return string icon 图标纹理
 function SpellSlot:FindSpell(...)

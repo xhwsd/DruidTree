@@ -46,7 +46,7 @@ end
 ---取生命损失
 ---@param unit? string 单位
 ---@return integer percentage 生命损失百分比
----@return integer residual 生命损失
+---@return integer lose 生命损失
 local function HealthLose(unit)
 	unit = unit or "player"
 	
@@ -111,7 +111,7 @@ end
 
 ---取治疗单位
 ---@param unit? string 单位；缺省为（友善目标 > 自己）
----@return string 单位
+---@return string unit 单位
 local function HealUnit(unit)
 	-- 缺省单位
 	if not unit then
@@ -294,9 +294,9 @@ function DaruidTree:CanHeal(unit)
 end
 
 -- 过量治疗单位
----@param unit string 目标单位
----@param swiftness number 剩余生命等于或小于该百分比时，使用自然迅捷
----@param swiftmend number 损失生命大于或等于该值时，使用迅捷治愈
+---@param unit? string 目标单位
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
 ---@return boolean success 成功返回真，否则返回假
 function DaruidTree:OverdoseHeal(unit, swiftness, swiftmend)
 	unit = HealUnit(unit)
