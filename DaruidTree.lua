@@ -14,8 +14,6 @@ DaruidTree = AceLibrary("AceAddon-2.0"):new(
 
 -- 名单库（团队/队伍）
 local rosterLib = AceLibrary("RosterLib-2.0")
--- 法术缓存
-local spellCache = AceLibrary("SpellCache-1.0")
 
 -- 效果检查
 local effectCheck = AceLibrary("EffectCheck-1.0")
@@ -125,7 +123,7 @@ local function HealUnit(unit)
 end
 
 ---施法提示
----@param spell? string 法术名称；可包含等级
+---@param spell string 法术名称；可包含等级
 ---@param unit? string 目标单位
 local function CastHint(spell, unit)
 	if not spell or spell == "" then
@@ -143,6 +141,8 @@ local function CastHint(spell, unit)
 			CastSpellByName(spell)
 			targetSwitch:ToLast()
 			UIErrorsFrame:AddMessage(string.format("对<%s>施放<%s>", UnitName(unit), spell), 0.0, 1.0, 0.0, 53, 5)
+		else
+			UIErrorsFrame:AddMessage(string.format("切换到单位<%s>施放<%s>失败", unit, spell), 1.0, 1.0, 0.0, 53, 5)
 		end
 	else
 		-- 未指定单位
@@ -276,14 +276,21 @@ function DaruidTree:CanHeal(unit)
 
 	-- 法术范围内（40码）
 	local slot = spellSlot:FindSpell("愈合", "回春术", "治疗之触")
-	if slot and targetSwitch:ToUnit(unit) then
+	if not slot then
+		self:LevelDebug(2, "可否治疗，未匹配到插槽")
+		-- 让法术判断
+		return true
+	end
+
+	if targetSwitch:ToUnit(unit) then
 		local satisfy = IsActionInRange(slot) == 1
 		targetSwitch:ToLast()
 		return satisfy
+	else
+		self:LevelDebug(2, "可否治疗，切换到单位失败；单位：%s", unit)
+		-- 让法术判断
+		return true
 	end
-
-	-- 让法术判断
-	return true
 end
 
 -- 过量治疗单位
