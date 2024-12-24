@@ -25,18 +25,18 @@ end
 -- 创建库对象
 local TargetSwitch = {}
 
--- 库激活
--- @param table self 库自身对象
--- @param table oldLib 旧版库对象
--- @param function oldDeactivate 旧版库停用函数
+---库激活
+---@param self table 库自身对象
+---@param oldLib table 旧版库对象
+---@param oldDeactivate function 旧版库停用函数
 local function activate(self, oldLib, oldDeactivate)
 
 end
 
--- 外部库加载
--- @param table self 库自身对象
--- @param string major 外部库主版本
--- @param table instance 外部库实例
+---外部库加载
+---@param self table 库自身对象
+---@param major string 外部库主版本
+---@param instance table 外部库实例
 local function external(self, major, instance)
 
 end
@@ -46,15 +46,13 @@ end
 -- 切换目标
 local switchTargets = {}
 
--- 切换到单位目标
--- @param string unit 单位
--- @return boolean 切换到单位成功
+---切换到单位目标
+---@param unit string 单位
+---@return boolean success 成功返回真，否则返回假
 function TargetSwitch:ToUnit(unit)
 	if not unit or unit == "" then
-		-- DebugError(1, "切换到单位目标无效：单位：%s", unit or "nil")
 		return false
 	elseif not UnitExists(unit) then
-		-- DebugWarning(2, "切换到单位目标不存在：单位：%s", unit)
 		return false
 	end
 
@@ -66,14 +64,13 @@ function TargetSwitch:ToUnit(unit)
 	if UnitIsUnit(switch.unit, "target") then
 		-- 相同目标
 		switch.type = 2
-		switch.after = before
+		switch.after = switch.before
 	elseif switch.before then
 		-- 其他目标
 		switch.type = 1
 		TargetUnit(switch.unit)
 		switch.after = UnitName("target")
 		if switch.after ~= switch.request then
-			-- DebugError(1, "其他目标切换到单位失败；切换前：%s；切换后：%s；要求：%s", switch.before, switch.after, switch.request)
 			return false
 		end
 	else
@@ -82,7 +79,6 @@ function TargetSwitch:ToUnit(unit)
 		TargetUnit(switch.unit)
 		switch.after = UnitName("target")
 		if switch.after ~= switch.request then
-			-- DebugError(1, "无目标切换到单位失败；切换前：%s；切换后：%s；要求：%s", switch.before, switch.after, switch.request)
 			return false
 		end
 	end
@@ -92,12 +88,11 @@ function TargetSwitch:ToUnit(unit)
 	return true
 end
 
--- 切换到名称目标
--- @param string name 名称
--- @return boolean 成功返回true，否则返回false
+---切换到名称目标
+---@param name string 名称
+---@return boolean success 成功返回真，否则返回假
 function TargetSwitch:ToName(name)
 	if not name or name == "" then
-		-- DebugError(1, "切换到名称目标无效；名称：%s", name or "nil")
 		return false
 	end
 
@@ -110,14 +105,13 @@ function TargetSwitch:ToName(name)
 	if switch.before == switch.request then
 		-- 相同目标
 		switch.type = 2
-		switch.after = before
+		switch.after = switch.before
 	elseif switch.before then
 		-- 其他目标
 		switch.type = 1
 		TargetByName(switch.request)
 		switch.after = UnitName("target")
 		if switch.after ~= switch.request then
-			-- DebugError(1, "其他目标切换到名称失败；切换前：%s；切换后：%s；要求：%s", switch.before, switch.after, switch.request)
 			return false
 		end
 	else
@@ -126,7 +120,6 @@ function TargetSwitch:ToName(name)
 		TargetByName(switch.request)
 		switch.after = UnitName("target")
 		if switch.after ~= switch.request then
-			-- DebugError(1, "无目标切换到名称失败；切换前：%s；切换后：%s；要求：%s", switch.before, switch.after, switch.request)
 			return false
 		end
 	end
@@ -136,11 +129,10 @@ function TargetSwitch:ToName(name)
 	return true
 end
 
--- 恢复到上次目标
--- @return boolean 成功返回true，否则返回false
+---恢复到上次目标
+---@return boolean success 成功返回真，否则返回假
 function TargetSwitch:ToLast()
 	if next(switchTargets) == nil then
-		-- DebugWarning(2, "切换目标列表为空")
 		return false
 	end
 
@@ -151,7 +143,6 @@ function TargetSwitch:ToLast()
 		local before = UnitName("target")
 		local after = before
 		if after ~= switch.before then
-			-- DebugError(1, "恢复到相同目标失败；切换前：%s；切换后：%s；要求：%s", before, after, switch.before)
 			return false
 		end
 	elseif switch.type == 1 then
@@ -160,7 +151,6 @@ function TargetSwitch:ToLast()
 		TargetLastTarget()
 		local after = UnitName("target")
 		if after ~= switch.before then
-			-- DebugError(1, "恢复到其他目标失败；切换前：%s；切换后：%s；要求：%s", before, after, switch.before)
 			return false
 		end
 	else

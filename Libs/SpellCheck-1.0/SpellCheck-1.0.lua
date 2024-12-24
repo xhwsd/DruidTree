@@ -22,7 +22,8 @@ if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
 	return
 end
 
--- 检查依赖库
+---检查依赖库
+---@param dependencies table 依赖库名称列表
 local function CheckDependency(dependencies)
 	for index, value in ipairs(dependencies) do
 		if not AceLibrary:HasInstance(value) then 
@@ -30,6 +31,7 @@ local function CheckDependency(dependencies)
 		end
 	end
 end
+
 CheckDependency({
 	-- 法术缓存
 	"SpellCache-1.0"
@@ -41,27 +43,27 @@ local spellCache = AceLibrary("SpellCache-1.0")
 -- 创建库对象
 local SpellCheck = {}
 
--- 库激活
--- @param table self 库自身对象
--- @param table oldLib 旧版库对象
--- @param function oldDeactivate 旧版库停用函数
+---库激活
+---@param self table 库自身对象
+---@param oldLib table 旧版库对象
+---@param oldDeactivate function 旧版库停用函数
 local function activate(self, oldLib, oldDeactivate)
 
 end
 
--- 外部库加载
--- @param table self 库自身对象
--- @param string major 外部库主版本
--- @param table instance 外部库实例
+---外部库加载
+---@param self table 库自身对象
+---@param major string 外部库主版本
+---@param instance table 外部库实例
 local function external(self, major, instance)
 
 end
 
 ------------------------------------------------
 
--- 检验法术的冷却时间是否结束
--- @param string spell 法术名称
--- @return boolean 已就绪返回true，否则返回false
+---检验法术的冷却时间是否结束
+---@param spell string 法术名称
+---@return boolean ready 已就绪返回真，否则返回假
 function SpellCheck:IsReady(spell)
 	if not spell then 
 		return false
@@ -88,11 +90,11 @@ function SpellCheck:IsReady(spell)
 	return false    
 end
 
--- 解析法术文本信息
--- @param string text 法术文本
--- @return string 法术名称
--- @return number 法术等级
--- @return number 法术索引；从1开始
+---解析法术文本信息
+---@param text string 法术文本
+---@return string name 法术名称
+---@return integer rank 法术等级
+---@return integer id 法术索引；从1开始
 function SpellCheck:parseText(text)
 	if text then
 		-- 取法术数据

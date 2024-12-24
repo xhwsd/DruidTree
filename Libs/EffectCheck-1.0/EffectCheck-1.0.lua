@@ -25,30 +25,30 @@ end
 -- 创建库对象
 local EffectCheck = {}
 
--- 库激活
--- @param table self 库自身对象
--- @param table oldLib 旧版库对象
--- @param function oldDeactivate 旧版库停用函数
+---库激活
+---@param self table 库自身对象
+---@param oldLib table 旧版库对象
+---@param oldDeactivate function 旧版库停用函数
 local function activate(self, oldLib, oldDeactivate)
 
 end
 
--- 外部库加载
--- @param table self 库自身对象
--- @param string major 外部库主版本
--- @param table instance 外部库实例
+---外部库加载
+---@param self table 库自身对象
+---@param major string 外部库主版本
+---@param instance table 外部库实例
 local function external(self, major, instance)
 
 end
 
 ------------------------------------------------
 
--- 查找单位效果名称
--- @param string name 效果名称
--- @param string unit = "player" 目标单位；额外还支持`mainhand`、`offhand`
--- @return string 效果类型；可选值：`mainhand`、`offhand`、`buff`、`debuff`
--- @return number 效果索引；从1开始
--- @return string 效果文本
+---查找单位效果名称
+---@param name string 效果名称
+---@param unit? string 目标单位；额外还支持`mainhand`、`offhand`
+---@return string kind 效果类型；可选值：`mainhand`、`offhand`、`buff`、`debuff`
+---@return integer index 效果索引；从1开始
+---@return string text 效果文本
 function EffectCheck:FindName(name, unit)
 	unit = unit or "player"
 
@@ -105,10 +105,12 @@ function EffectCheck:FindName(name, unit)
 	end
 end
 
--- 查找单位效果图标
--- @param string icon 效果图标
--- @param string unit = "player" 目标单位；额外还支持`mainhand`、`offhand`
--- @return string 效果类型
+---查找单位效果图标
+---@param icon string 效果图标
+---@param unit string 目标单位；额外还支持`mainhand`、`offhand`
+---@return string kind 效果类型；可选值：`mainhand`、`offhand`、`buff`、`debuff`
+---@return integer index 效果索引；从1开始
+---@return string text 效果文本
 function EffectCheck:FindIcon(icon, unit)
 	
 end

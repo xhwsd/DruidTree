@@ -31,10 +31,10 @@ local castStatus = AceLibrary("CastStatus-1.0")
 -- 名单
 local rosters = {}
 
--- 位与数组
--- @param table array 数组(索引表）
--- @param string|number data 数据
--- @return number 成功返回索引，失败返回nil
+---位与数组
+---@param array table 数组(索引表）
+---@param data string|number 数据
+---@return integer|nil index 成功返回索引，失败返回空
 local function InArray(array, data)
 	if type(array) == "table" then
 		for index, value in ipairs(array) do
@@ -45,10 +45,10 @@ local function InArray(array, data)
 	end
 end
 
--- 取生命损失
--- @param string unit = "player" 单位
--- @return number 生命损失百分比
--- @return number 生命损失
+---取生命损失
+---@param unit? string 单位
+---@return integer percentage 生命损失百分比
+---@return integer residual 生命损失
 local function HealthLose(unit)
 	unit = unit or "player"
 	
@@ -60,10 +60,10 @@ local function HealthLose(unit)
 	return math.floor(lose / max * 100), lose
 end
 
--- 取生命剩余
--- @param string unit = "player" 单位
--- @return number 生命剩余百分比
--- @return number 生命剩余
+---取生命剩余
+---@param unit? string 单位
+---@return integer percentage 生命剩余百分比
+---@return integer residual 生命剩余
 local function HealthResidual(unit)
 	unit = unit or "player"
 
@@ -73,11 +73,11 @@ local function HealthResidual(unit)
 	return math.floor(residual / UnitHealthMax(unit) * 100), residual
 end
 
--- 适配治疗法术等级
--- @param string name 法术名称；可选值：回春术、愈合
--- @param number health 目前失血
--- @param string unit = nil 治疗单位
--- @return string 法术名称(含等级)
+---适配治疗法术等级
+---@param name string 法术名称；可选值：回春术、愈合
+---@param health integer 目前失血
+---@param unit? string 治疗单位
+---@return string spell 法术名称(含等级)
 local function AdaptRank(name, health, unit)
 	-- 法术规则
 	local spells = {
@@ -111,9 +111,9 @@ local function AdaptRank(name, health, unit)
 	return name
 end  
 
--- 取治疗单位
--- @param string unit = nil 单位；缺省为（友善目标 > 自己）
--- @return string 单位
+---取治疗单位
+---@param unit? string 单位；缺省为（友善目标 > 自己）
+---@return string 单位
 local function HealUnit(unit)
 	-- 缺省单位
 	if not unit then
@@ -124,9 +124,9 @@ local function HealUnit(unit)
 	return UnitIsFriend("player", unit) and unit or "player"
 end
 
--- 施法提示
--- @param string spell 法术名称；可包含等级
--- @param string unit = nil 目标单位
+---施法提示
+---@param spell? string 法术名称；可包含等级
+---@param unit? string 目标单位
 local function CastHint(spell, unit)
 	if not spell or spell == "" then
 		return
@@ -151,7 +151,7 @@ local function CastHint(spell, unit)
 	end
 end
 
--- 插件载入
+---插件载入
 function DaruidTree:OnInitialize()
 	-- 精简标题
 	self.title = "树德辅助"
@@ -161,7 +161,7 @@ function DaruidTree:OnInitialize()
 	self:SetDebugLevel(2)
 end
 
--- 插件打开
+---插件打开
 function DaruidTree:OnEnable()
 	self:LevelDebug(3, "插件打开")
 
@@ -189,17 +189,17 @@ function DaruidTree:OnEnable()
 	})
 end
 
--- 插件关闭
+---插件关闭
 function DaruidTree:OnDisable()
 	self:LevelDebug(3, "插件关闭")
 end
 
--- 打断治疗
--- @param number start = 0 起始生命损失百分比
--- @param boolean 已打断返回true，未打断返回false
+---打断治疗
+---@param start? integer 起始生命损失百分比
+---@return boolean stop 已打断返回真，未打断返回假
 function DaruidTree:StopHeal(start)
 	start = start or 0
-	
+
 	-- 正在施法中
 	local casting, spell, target = castStatus:GetStatus()
 	if casting then
@@ -233,9 +233,9 @@ function DaruidTree:StopHeal(start)
 	return false
 end
 
--- 检验单位可否治疗
--- @param string unit = "player" 治疗单位
--- @return boolean 是否可治疗
+---检验单位可否治疗
+---@param unit? string 治疗单位
+---@return boolean can 是否可治疗
 function DaruidTree:CanHeal(unit)
 	unit = unit or "player"
 
@@ -287,10 +287,10 @@ function DaruidTree:CanHeal(unit)
 end
 
 -- 过量治疗单位
--- @param string unit = HealUnit(unit) 目标单位
--- @param number swiftness = 40 剩余生命等于或小于该百分比时，使用自然迅捷
--- @param number swiftmend = 1500 损失生命大于或等于该值时，使用迅捷治愈
--- @return boolean 成功返回true，否则返回false
+---@param unit string 目标单位
+---@param swiftness number 剩余生命等于或小于该百分比时，使用自然迅捷
+---@param swiftmend number 损失生命大于或等于该值时，使用迅捷治愈
+---@return boolean success 成功返回真，否则返回假
 function DaruidTree:OverdoseHeal(unit, swiftness, swiftmend)
 	unit = HealUnit(unit)
 	swiftness = swiftness or 40
@@ -319,13 +319,13 @@ function DaruidTree:OverdoseHeal(unit, swiftness, swiftmend)
 	return true
 end
 
--- 节省治疗单位
--- @param string unit = HealUnit(unit) 目标单位
--- @param number start = 6 起始生命损失百分比
--- @param number rank = 4 愈合法术等级
--- @param number swiftness = 40 剩余生命等于或小于该百分比时，使用自然迅捷
--- @param number swiftmend = 1500 损失生命大于或等于该值时，使用迅捷治愈
--- @return boolean 成功返回true，否则返回false
+---节省治疗单位
+---@param unit? string 目标单位
+---@param start? integer 起始生命损失百分比
+---@param rank? integer 愈合法术等级
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@return boolean success 成功返回真，否则返回假
 function DaruidTree:EconomizeHeal(unit, start, rank, swiftness, swiftmend)
 	unit = HealUnit(unit)
 	start = start or 6
@@ -360,11 +360,11 @@ function DaruidTree:EconomizeHeal(unit, start, rank, swiftness, swiftmend)
 	return true
 end
 
--- 尽力治疗单位
--- @param string unit = HealUnit(unit) 目标单位
--- @param number swiftness = 40 剩余生命等于或小于该百分比时，使用自然迅捷
--- @param number swiftmend = 1500 损失生命大于或等于该值时，使用迅捷治愈
--- @return boolean 成功返回true，否则返回false
+---尽力治疗单位
+---@param unit? string 目标单位
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@return boolean success 成功返回真，否则返回假
 function DaruidTree:EndeavorHeal(unit, swiftness, swiftmend)
 	unit = HealUnit(unit)
 	swiftness = swiftness or 40
@@ -382,7 +382,7 @@ function DaruidTree:EndeavorHeal(unit, swiftness, swiftmend)
 		self:LevelDebug(3, "尽力治疗，未损失生命；目标：%s", UnitName(unit))
 		return false
 	end
-	
+
 	-- 尽力治疗
 	self:LevelDebug(3, "尽力治疗；目标：%s；损失：%d", UnitName(unit), lose)
 	if effectCheck:FindName("自然迅捷", "player") then
@@ -399,9 +399,9 @@ function DaruidTree:EndeavorHeal(unit, swiftness, swiftmend)
 	return true
 end
 
--- 查找队伍中损失最多单位
--- @param number start = 4 起始损失百分比
--- @return string|nil 已找到返回单位，未找到否则返回nil
+---查找队伍中损失最多单位
+---@param start? integer 起始损失百分比
+---@return string|nil target 已找到返回单位，未找到否则返回空
 function DaruidTree:FindParty(start)
 	start = start or 4
 
@@ -427,8 +427,8 @@ function DaruidTree:FindParty(start)
 end
 
 -- 查找团队中损失最多单位
--- @param number start = 6 起始生命损失百分比
--- @return string|nil 已找到返回单位，未找到否则返回nil
+---@param start? integer 起始生命损失百分比
+---@return string|nil target 已找到返回单位，未找到否则返回空
 function DaruidTree:FindRaid(start)
 	start = start or 6
 
@@ -445,9 +445,9 @@ function DaruidTree:FindRaid(start)
 	return target
 end
 
--- 查找名单中损失最多名称
--- @param number start = 2 起始生命损失百分比
--- @return string|nil 已找到返回名称，未找到否则返回nil
+---查找名单中损失最多名称
+---@param start? integer 起始生命损失百分比
+---@return string|nil target 已找到返回单位，未找到否则返回空
 function DaruidTree:FindRoster(start)
 	start = start or 2
 
@@ -475,10 +475,10 @@ function DaruidTree:FindRoster(start)
 	return target
 end
 
--- 补充名单增益
--- @param string buff = "回春术" 增益名称
--- @param string spell = buff 法术名称
--- @return string|nil 已补返回名称，未补返回nil
+---补充名单增益
+---@param buff? string 增益名称
+---@param spell? string 法术名称
+---@return string|nil target 已补返回名称，未补返回空
 function DaruidTree:AddedBuff(buff, spell)
 	buff = buff or "回春术"
 	spell = spell or buff
@@ -512,10 +512,10 @@ function DaruidTree:AddedBuff(buff, spell)
 	return target
 end
 
--- 尝试治疗选择目标
--- @param number swiftness = 40 剩余生命等于或小于该百分比时，使用自然迅捷
--- @param number swiftmend = 1500 损失生命大于或等于该值时，使用迅捷治愈
--- @return boolean 成功返回true，否则返回false
+---尝试治疗选择目标
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@return boolean success 成功返回真，否则返回假
 function DaruidTree:HealSelect(swiftness, swiftmend)
 	swiftness = swiftness or 40
 	swiftmend = swiftmend or 1500
@@ -544,11 +544,11 @@ function DaruidTree:HealSelect(swiftness, swiftmend)
 	return false
 end
 
--- 尝试尽力治疗队伍中生命损失最多的目标
--- @param number start = 4 起始生命损失百分比
--- @param number swiftness = 40 剩余生命等于或小于该百分比时，使用自然迅捷
--- @param number swiftmend = 1500 损失生命大于或等于该值时，使用迅捷治
--- @return boolean 成功返回true，否则返回false
+---尝试尽力治疗队伍中生命损失最多的目标
+---@param start? integer 起始生命损失百分比
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@return boolean success 成功返回真，否则返回假
 function DaruidTree:HealParty(start, swiftness, swiftmend)
 	start = start or 4
 	swiftness = swiftness or 40
@@ -558,7 +558,7 @@ function DaruidTree:HealParty(start, swiftness, swiftmend)
 	if self:StopHeal(start) then
 		return true
 	end
-	
+
 	-- 查找队伍损失
 	local unit = self:FindParty(start)
 	if unit then
@@ -570,12 +570,12 @@ function DaruidTree:HealParty(start, swiftness, swiftmend)
 	return false
 end
 
--- 尝试节约治疗团队中生命损失最多的目标
--- @param number start = 6 起始生命损失百分比
--- @param number rank = 4 愈合法术等级
--- @param number swiftness = 40 剩余生命等于或小于该百分比时，使用自然迅捷
--- @param number swiftmend = 1500 损失生命大于或等于该值时，使用迅捷治愈
--- @return boolean 成功返回true，否则返回false
+---尝试节约治疗团队中生命损失最多的目标
+---@param start? integer 起始生命损失百分比
+---@param rank? integer 愈合法术等级
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@return boolean success 成功返回真，否则返回假
 function DaruidTree:HealRaid(start, rank, swiftness, swiftmend)
 	start = start or 6
 	rank = rank or 4
@@ -598,11 +598,11 @@ function DaruidTree:HealRaid(start, rank, swiftness, swiftmend)
 	return false
 end
 
--- 尝试治疗名单、团队、队伍、选择中生命损失最多的目标
--- @param number start = 2 起始生命损失百分比
--- @param number swiftness = 40 剩余生命等于或小于该百分比时，使用自然迅捷
--- @param number swiftmend = 1500 损失生命大于或等于该值时，使用迅捷治
--- @return boolean 成功返回true，否则返回false
+---尝试治疗名单、团队、队伍、选择中生命损失最多的目标
+---@param start? integer 起始生命损失百分比
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@return boolean success 成功返回真，否则返回假
 function DaruidTree:HealRoster(start, swiftness, swiftmend)
 	start = start or 2
 	swiftness = swiftness or 40
@@ -633,10 +633,10 @@ function DaruidTree:HealRoster(start, swiftness, swiftmend)
 		end
 	elseif UnitInRaid("player") then
 		-- 治疗团队
-		return self:HealRaid()
+		return self:HealRaid(nil, nil, swiftness, swiftmend)
 	elseif UnitInParty("player") then
 		-- 治疗队伍
-		return self:HealParty()
+		return self:HealParty(nil, swiftness, swiftmend)
 	elseif self:HealSelect() then
 		-- 治疗选择
 		return true
@@ -646,7 +646,7 @@ function DaruidTree:HealRoster(start, swiftness, swiftmend)
 	return false
 end
 
--- 将目标加入或移除名单
+---将目标加入或移除名单
 function DaruidTree:Roster()
 	if IsAltKeyDown() then
 		-- 名单清空
@@ -681,7 +681,7 @@ function DaruidTree:Roster()
 	end
 end
 
--- 节能：对附近进入战斗目标施法精灵之火（按下ALT释放最高级），以此触发节能效果
+---节能：对附近进入战斗目标施法精灵之火（按下ALT释放最高级），以此触发节能效果
 function DaruidTree:EnergySaving()
 	-- 打断施法
 	SpellStopCasting()

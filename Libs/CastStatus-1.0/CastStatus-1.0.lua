@@ -22,7 +22,8 @@ if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
 	return
 end
 
--- 检查依赖库
+---检查依赖库
+--- @param dependencies table 依赖库名称列表
 local function CheckDependency(dependencies)
 	for index, value in ipairs(dependencies) do
 		if not AceLibrary:HasInstance(value) then 
@@ -30,6 +31,7 @@ local function CheckDependency(dependencies)
 		end
 	end
 end
+
 CheckDependency({
 	-- 事件
 	"AceEvent-2.0",
@@ -49,10 +51,10 @@ local gratuity = AceLibrary("Gratuity-2.0")
 -- 创建库对象
 local CastStatus = {}
 
--- 库激活
--- @param table self 库自身对象
--- @param table oldLib 旧版库对象
--- @param function oldDeactivate 旧版库停用函数
+---库激活
+---@param self table 库自身对象
+---@param oldLib table 旧版库对象
+---@param oldDeactivate function 旧版库停用函数
 local function activate(self, oldLib, oldDeactivate)
 	CastStatus = self
 
@@ -67,10 +69,10 @@ local function activate(self, oldLib, oldDeactivate)
 	end
 end
 
--- 外部库加载
--- @param table self 库自身对象
--- @param string major 外部库主版本
--- @param table instance 外部库实例
+---外部库加载
+---@param self table 库自身对象
+---@param major string 外部库主版本
+---@param instance table 外部库实例
 local function external(self, major, instance)
 	if major == "AceEvent-2.0" then
 		-- 混入事件
@@ -108,26 +110,26 @@ local cast = {
 	casting = false,
 }
 
--- 施法开始
+---施法开始
 function CastStatus:SPELLCAST_START()
 	cast.casting = true
 	cast.spell = arg1
 	-- self:LevelDebug(3, "施法开始；法术：%s；目标：%s", cast.spell, cast.target)
 end
 
--- 施法停止
+---施法停止
 function CastStatus:SPELLCAST_STOP()
 	cast.casting = false
 	-- self:LevelDebug(3, "施法停止；法术：%s；目标：%s", cast.spell, cast.target)
 end
 
--- 施法失败
+---施法失败
 function CastStatus:SPELLCAST_FAILED()
 	cast.casting = false
 	-- self:LevelDebug(3, "施法失败；法术：%s；目标：%s", cast.spell, cast.target)
 end
 
--- 使用动作条
+---使用动作条
 function CastStatus:UseAction(slotId, checkCursor, onSelf)
 	-- self:LevelDebug(3, "UseAction", slotId, checkCursor, onSelf)
 	self.hooks.UseAction(slotId, checkCursor, onSelf)
@@ -151,7 +153,7 @@ function CastStatus:UseAction(slotId, checkCursor, onSelf)
 	self:HandleCast(spell, unit)
 end
 
--- 施展法术
+---施展法术
 function CastStatus:CastSpell(spellId, spellbookType)
 	-- self:LevelDebug(3, "CastSpell", spellId, spellbookType)
 	self.hooks.CastSpell(spellId, spellbookType)
@@ -169,7 +171,7 @@ function CastStatus:CastSpell(spellId, spellbookType)
 	self:HandleCast(spell, unit)
 end
 
--- 按名称施展法术
+---按名称施展法术
 function CastStatus:CastSpellByName(spellName, onSelf)
 	-- self:LevelDebug(3, "CastSpellByName", spellName, onSelf)
 	self.hooks.CastSpellByName(spellName, onSelf)
@@ -187,36 +189,36 @@ function CastStatus:CastSpellByName(spellName, onSelf)
 	self:HandleCast(spell, unit)
 end
 
--- 处理施法
--- @param string spell 法术名称
--- @param string unit 目标单位
+---处理施法
+---@param spell string 法术名称
+---@param unit string 目标单位
 function CastStatus:HandleCast(spell, unit)
 	cast.spell = spell
 	cast.target = UnitName(unit)
 end
 
--- 取施法状态
--- @return boolean 是否在施法中
--- @return string 施法名称
--- @return string 施法目标
+---取施法状态
+---@return boolean casting 是否在施法中
+---@return string spell 施法名称
+---@return string target 施法目标
 function CastStatus:GetStatus()
 	return cast.casting, cast.spell, cast.target
 end
 
--- 是否在施法中
--- @return boolean 是否在施法中
+---是否在施法中
+---@return boolean casting 是否在施法中
 function CastStatus:IsCasting()
 	return cast.casting
 end
 
--- 取施法名称
--- @return string 施法名称
+---取施法名称
+---@return string spell 施法名称
 function CastStatus:GetSpell()
 	return cast.spell
 end
 
--- 取施法目标
--- @return string 施法目标
+---取施法目标
+---@return string target 施法目标
 function CastStatus:GetTarget()
 	return cast.target
 end

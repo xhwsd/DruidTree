@@ -22,7 +22,8 @@ if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
 	return
 end
 
--- 检查依赖库
+---检查依赖库
+---@param dependencies table 依赖库名称列表
 local function CheckDependency(dependencies)
 	for index, value in ipairs(dependencies) do
 		if not AceLibrary:HasInstance(value) then 
@@ -30,6 +31,7 @@ local function CheckDependency(dependencies)
 		end
 	end
 end
+
 CheckDependency({
 	-- 提示解析
 	"Gratuity-2.0", 
@@ -44,18 +46,18 @@ local spellCache = AceLibrary("SpellCache-1.0")
 -- 创建库对象
 local SpellSlot = {}
 
--- 库激活
--- @param table self 库自身对象
--- @param table oldLib 旧版库对象
--- @param function oldDeactivate 旧版库停用函数
+---库激活
+---@param self table 库自身对象
+---@param oldLib table 旧版库对象
+---@param oldDeactivate function 旧版库停用函数
 local function activate(self, oldLib, oldDeactivate)
 
 end
 
--- 外部库加载
--- @param table self 库自身对象
--- @param string major 外部库主版本
--- @param table instance 外部库实例
+---外部库加载
+---@param self table 库自身对象
+---@param major string 外部库主版本
+---@param instance table 外部库实例
 local function external(self, major, instance)
 
 end
@@ -65,10 +67,10 @@ end
 -- 法术缓存
 local spellCaches = {}
 
--- 检验值是否包含于索引数组中
--- @param table array 数组(索引表）
--- @param string|number value 值
--- @return number 返回索引
+---检验值是否包含于索引数组中
+---@param array table 数组(索引表）
+---@param value any 值
+---@return integer index 返回索引
 local function InArray(array, value)
 	if type(array) == "table" then
 		for index, data in ipairs(array) do
@@ -79,9 +81,9 @@ local function InArray(array, value)
 	end
 end
 
--- 取插槽法术图标
--- @param number slot 插槽索引
--- @return string 图标纹理
+---取插槽法术图标
+---@param slot integer 插槽索引
+---@return string icon 图标纹理
 local function GetSpellIcon(slot)
 	-- 普通法术没有文本
 	if slot and HasAction(slot) and not GetActionText(slot) then
@@ -89,25 +91,25 @@ local function GetSpellIcon(slot)
 	end
 end
 
--- 检验插槽是否为宏
--- @param number slot 插槽索引；从1开始
--- @return boolean 是否为宏
+---检验插槽是否为宏
+---@param slot integer 插槽索引；从1开始
+---@return boolean is 是否为宏
 function SpellSlot:IsMacro(slot)
 	return slot and HasAction(slot) and GetActionText(slot) ~= nil
 end
 
--- 检验插槽是否法术（非宏）
--- @param number slot 插槽索引；从1开始
--- @return boolean 是否为法术
+---检验插槽是否法术（非宏）
+---@param slot integer 插槽索引；从1开始
+---@return boolean is 是否为法术
 function SpellSlot:IsSpell(slot)
 	return slot and HasAction(slot) and not GetActionText(slot)
 end
 
--- 取插槽法术信息
--- @param number slot 插槽索引；从1开始
--- @return string 法术名称
--- @return number 法术等级
--- @return number 法术索引；从1开始
+---取插槽法术信息
+---@param slot integer 插槽索引；从1开始
+---@return string name 法术名称
+---@return integer rank 法术等级
+---@return integer id 法术索引；从1开始
 function SpellSlot:GetSpell(slot)
 	-- 仅限法术插槽
 	if self:IsSpell(slot) then
@@ -122,10 +124,10 @@ function SpellSlot:GetSpell(slot)
 end
 
 -- 查找任意一个法术在动作条中的插槽索引
--- @param sting ... 法术名称
--- @return number 插槽索引；1~120
--- @return sting 法术名称
--- @return sting 图标纹理
+---@param ... string 法术名称
+---@return number slot 插槽索引；1~120
+---@return string name 法术名称
+---@return string icon 图标纹理
 function SpellSlot:FindSpell(...)
 	-- 检验法术
 	if arg.n == 0 then

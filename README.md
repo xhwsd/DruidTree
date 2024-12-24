@@ -43,9 +43,9 @@
 ```
 
 参数列表：
-- `@param number start = 4` 起始生命损失百分比
-- `@param number swiftness = 40` 剩余生命等于或小于该百分比时，使用自然迅捷
-- `@param number swiftmend = 1500` 损失生命大于或等于该值时，使用迅捷治愈
+- `@param start? integer` 起始生命损失百分比
+- `@param swiftness? integer` 剩余生命等于或小于该百分比时，使用自然迅捷
+- `@param swiftmend? integer` 损失生命大于或等于该值时，使用迅捷治愈
 
 逻辑描述：
 - 检验打断施法（省蓝）
@@ -62,10 +62,10 @@
 ```
 
 参数列表：
-- `@param number start = 6` 起始生命损失百分比
-- `@param number rank = 4` 愈合法术等级
-- `@param number swiftness = 40` 剩余生命等于或小于该百分比时，使用自然迅捷
-- `@param number swiftmend = 1500` 损失生命大于或等于该值时，使用迅捷治愈
+- `@param start? integer` 起始生命损失百分比
+- `@param rank? integer` 愈合法术等级
+- `@param swiftness? integer` 剩余生命等于或小于该百分比时，使用自然迅捷
+- `@param swiftmend? integer` 损失生命大于或等于该值时，使用迅捷治愈
 
 逻辑描述：
 - 检验打断施法（省蓝）
@@ -82,9 +82,9 @@
 ```
 
 参数列表：
-- `@param number start = 2` 起始生命损失百分比
-- `@param number swiftness = 40` 剩余生命等于或小于该百分比时，使用自然迅捷
-- `@param number swiftmend = 1500` 损失生命大于或等于该值时，使用迅捷治愈
+- `@param start? integer` 起始生命损失百分比
+- `@param swiftness? integer` 剩余生命等于或小于该百分比时，使用自然迅捷
+- `@param swiftmend? integer` 损失生命大于或等于该值时，使用迅捷治愈
 
 大致逻辑：
 - 检验打断施法（省蓝）
