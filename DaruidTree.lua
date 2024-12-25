@@ -31,7 +31,7 @@ local rosters = {}
 
 ---位与数组
 ---@param array table 数组(索引表）
----@param data string|number 数据
+---@param data any 数据
 ---@return integer|nil index 成功返回索引，失败返回空
 local function InArray(array, data)
 	if type(array) == "table" then
@@ -106,6 +106,8 @@ local function AdaptRank(name, health, unit)
 			end
 		end
 	end
+
+	-- 最高等级
 	return name
 end  
 
@@ -122,32 +124,37 @@ local function HealUnit(unit)
 	return UnitIsFriend("player", unit) and unit or "player"
 end
 
----施法提示
+---施放法术
 ---@param spell string 法术名称；可包含等级
 ---@param unit? string 目标单位
-local function CastHint(spell, unit)
+---@return boolean success 成功返回真，否则返回假
+local function CastSpell(spell, unit)
 	if not spell or spell == "" then
-		return
+		return false
 	end
 	
 	-- 指定单位
 	if unit then
 		if UnitIsUnit(unit, "player") then
 			-- 自我施法
-			CastSpellByName(spell, 1)
 			UIErrorsFrame:AddMessage(string.format("对自己施放<%s>", spell), 0.0, 1.0, 0.0, 53, 5)
+			CastSpellByName(spell, 1)
+			return true
 		elseif targetSwitch:ToUnit(unit) then
 			-- 目标施法
+			UIErrorsFrame:AddMessage(string.format("对<%s>施放<%s>", UnitName(unit), spell), 0.0, 1.0, 0.0, 53, 5)
 			CastSpellByName(spell)
 			targetSwitch:ToLast()
-			UIErrorsFrame:AddMessage(string.format("对<%s>施放<%s>", UnitName(unit), spell), 0.0, 1.0, 0.0, 53, 5)
+			return true
 		else
 			UIErrorsFrame:AddMessage(string.format("切换到单位<%s>施放<%s>失败", unit, spell), 1.0, 1.0, 0.0, 53, 5)
+			return false
 		end
 	else
 		-- 未指定单位
-		CastSpellByName(spell)
 		UIErrorsFrame:AddMessage(string.format("施放<%s>", spell), 0.0, 1.0, 0.0, 53, 5)
+		CastSpellByName(spell)
+		return true
 	end
 end
 
@@ -222,9 +229,9 @@ function DaruidTree:StopHeal(start)
 				end
 			end
 			
+			-- 检验生命损失
 			if lose <= start then
 				self:LevelDebug(3, "打断治疗；法术：%s；目标：%s；起始：%d；损失：%d", spell, target, start, lose)
-				-- 测试发现对NPC愈合时无法真正打断 xhwsd@qq.com 2024-11-15
 				SpellStopCasting()
 				return true
 			end
@@ -250,7 +257,7 @@ function DaruidTree:CanHeal(unit)
 	end
 
 	-- 自己
-	if UnitIsPlayer(unit) then
+	if UnitIsUnit(unit, "player") then
 		return true
 	end
 
@@ -274,7 +281,7 @@ function DaruidTree:CanHeal(unit)
 		return true
 	end
 
-	-- 法术范围内（40码）
+	-- 取动作插槽
 	local slot = spellSlot:FindSpell("愈合", "回春术", "治疗之触")
 	if not slot then
 		self:LevelDebug(2, "可否治疗，未匹配到插槽")
@@ -282,6 +289,7 @@ function DaruidTree:CanHeal(unit)
 		return true
 	end
 
+	-- 法术范围内（40码）
 	if targetSwitch:ToUnit(unit) then
 		local satisfy = IsActionInRange(slot) == 1
 		targetSwitch:ToLast()
@@ -313,15 +321,15 @@ function DaruidTree:OverdoseHeal(unit, swiftness, swiftmend)
 	local lose, health = HealthLose(unit)
 	self:LevelDebug(3, "过量治疗；目标：%s；损失：%d", UnitName(unit), lose)
 	if effectCheck:FindName("自然迅捷") then
-		CastHint("愈合", unit)
+		CastSpell("愈合", unit)
 	elseif HealthResidual(unit) <= swiftness and spellCheck:IsReady("自然迅捷") then
-		CastHint("自然迅捷")
+		CastSpell("自然迅捷")
 	elseif health >= swiftmend and spellCheck:IsReady("迅捷治愈") and (effectCheck:FindName("愈合", unit) or effectCheck:FindName("回春术", unit)) then
-		CastHint("迅捷治愈", unit)
+		CastSpell("迅捷治愈", unit)
 	elseif not effectCheck:FindName("回春术", unit) then
-		CastHint("回春术", unit)
+		CastSpell("回春术", unit)
 	else
-		CastHint("愈合", unit)
+		CastSpell("愈合", unit)
 	end
 	return true
 end
@@ -356,13 +364,13 @@ function DaruidTree:EconomizeHeal(unit, start, rank, swiftness, swiftmend)
 	-- 节省治疗
 	self:LevelDebug(3, "节省治疗；目标：%s；起始：%d；损失：%d", UnitName(unit), start, lose)
 	if effectCheck:FindName("自然迅捷", "player") then
-		CastHint(AdaptRank("愈合", health, unit), unit)
+		CastSpell(AdaptRank("愈合", health, unit), unit)
 	elseif HealthResidual(unit) <= swiftness and spellCheck:IsReady("自然迅捷") then
-		CastHint("自然迅捷")
+		CastSpell("自然迅捷")
 	elseif health >= swiftmend and spellCheck:IsReady("迅捷治愈") and (effectCheck:FindName("愈合", unit) or effectCheck:FindName("回春术", unit)) then
-		CastHint("迅捷治愈", unit)
+		CastSpell("迅捷治愈", unit)
 	else
-		CastHint(string.format("愈合(等级 %d)", rank), unit) 
+		CastSpell(string.format("愈合(等级 %d)", rank), unit) 
 	end
 	return true
 end
@@ -393,15 +401,15 @@ function DaruidTree:EndeavorHeal(unit, swiftness, swiftmend)
 	-- 尽力治疗
 	self:LevelDebug(3, "尽力治疗；目标：%s；损失：%d", UnitName(unit), lose)
 	if effectCheck:FindName("自然迅捷", "player") then
-		CastHint(AdaptRank("愈合", health, unit), unit)
+		CastSpell(AdaptRank("愈合", health, unit), unit)
 	elseif HealthResidual(unit) <= swiftness and spellCheck:IsReady("自然迅捷") then
-		CastHint("自然迅捷")
+		CastSpell("自然迅捷")
 	elseif health >= swiftmend and spellCheck:IsReady("迅捷治愈") and (effectCheck:FindName("愈合", unit) or effectCheck:FindName("回春术", unit)) then
-		CastHint("迅捷治愈", unit)
+		CastSpell("迅捷治愈", unit)
 	elseif not effectCheck:FindName("回春术", unit) then
-		CastHint(AdaptRank("回春术", health, unit), unit)
+		CastSpell(AdaptRank("回春术", health, unit), unit)
 	else
-		CastHint(AdaptRank("愈合", health, unit), unit)
+		CastSpell(AdaptRank("愈合", health, unit), unit)
 	end
 	return true
 end
@@ -491,32 +499,27 @@ function DaruidTree:AddedBuff(buff, spell)
 	spell = spell or buff
 
 	-- 名单查找
-	local target
 	for _, name in ipairs(rosters) do
 		local unit = rosterLib:GetUnitIDFromName(name)
 		if unit then
 			if not effectCheck:FindName(buff, unit) and self:CanHeal(unit) then
-				target = name
-				break
+				-- 补充增益
+				self:LevelDebug(3, "补充名单增益；目标：%s；法术：%s", UnitName(unit), spell)   
+				CastSpell(spell, unit)
+				return name
 			end
 		elseif targetSwitch:ToName(name) then
 			if not effectCheck:FindName(buff, "target") and self:CanHeal("target") then
+				-- 补充增益
+				self:LevelDebug(3, "补充名单增益；目标：%s；法术：%s", UnitName("target"), spell)  
+				CastSpell(spell, "target")
 				targetSwitch:ToLast()
-				target = name
-				break
+				return name
 			else
 				targetSwitch:ToLast()
 			end
 		end
 	end
-
-	-- 补充增益
-	if target and targetSwitch:ToName(target) then
-		self:LevelDebug(3, "补充名单增益；目标：%s；法术：%s", UnitName("target"), spell)   
-		CastHint(spell, "target")
-		targetSwitch:ToLast()
-	end
-	return target
 end
 
 ---尝试治疗选择目标
