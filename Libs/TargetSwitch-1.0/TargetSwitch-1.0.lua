@@ -140,14 +140,12 @@ function TargetSwitch:ToLast()
 	local switch = table.remove(switchTargets, 1)
 	if switch.type == 2 then
 		-- 相同目标
-		local before = UnitName("target")
-		local after = before
+		local after = UnitName("target")
 		if after ~= switch.before then
 			return false
 		end
 	elseif switch.type == 1 then
 		-- 其他目标
-		local before = UnitName("target")
 		TargetLastTarget()
 		local after = UnitName("target")
 		if after ~= switch.before then
