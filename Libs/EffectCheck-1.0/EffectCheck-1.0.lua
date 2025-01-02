@@ -45,7 +45,7 @@ end
 
 ---查找单位效果名称
 ---@param name string 效果名称
----@param unit? string 目标单位；额外还支持`mainhand`、`offhand`
+---@param unit? string 目标单位；额外还支持`mainhand`、`offhand`；缺省为`player`
 ---@return string kind 效果类型；可选值：`mainhand`、`offhand`、`buff`、`debuff`
 ---@return integer index 效果索引；从1开始
 ---@return string text 效果文本

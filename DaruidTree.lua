@@ -252,6 +252,7 @@ function DaruidTree:StopHeal(start)
 			-- 检验生命损失
 			if lose <= start then
 				self:LevelDebug(3, "打断治疗；法术：%s；目标：%s；起始：%d；损失：%d", spell, target, start, lose)
+				-- 打断施放
 				SpellStopCasting()
 				return true
 			end
