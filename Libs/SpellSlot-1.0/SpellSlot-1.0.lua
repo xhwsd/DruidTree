@@ -135,9 +135,8 @@ function SpellSlot:FindSpell(...)
 	end
 
 	-- 从缓存匹配
-	for index = 1, arg.n, 1 do
-		if type(arg[index]) == "string" and arg[index] ~= "" then
-			local spell = arg[index]
+	for _, spell in ipairs(arg) do
+		if type(spell) == "string" and spell ~= "" then
 			if spellCaches[spell] then
 				local icon, slot = spellCaches[spell].icon, spellCaches[spell].slot
 				if icon and slot and icon == GetSpellIcon(slot) then

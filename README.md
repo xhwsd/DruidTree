@@ -39,13 +39,13 @@
 
 ```
 /script -- CastSpellByName("愈合")
-/script DaruidTree:HealParty(4, 40, 1500)
+/script DaruidTree:HealParty()
 ```
 
 参数列表：
-- `@param start? integer` 起始生命损失百分比
-- `@param swiftness? integer` 剩余生命等于或小于该百分比时，使用自然迅捷
-- `@param swiftmend? integer` 损失生命大于或等于该值时，使用迅捷治愈
+- `@param start? integer` 起始生命损失百分比；缺省为`4`
+- `@param swiftness? integer` 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
+- `@param swiftmend? integer` 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 
 逻辑描述：
 - 检验打断施法（省蓝）
@@ -58,14 +58,14 @@
 
 ```
 /script -- CastSpellByName("愈合")
-/script DaruidTree:HealRaid(6, 4, 40, 1500)
+/script DaruidTree:HealRaid()
 ```
 
 参数列表：
-- `@param start? integer` 起始生命损失百分比
-- `@param rank? integer` 愈合法术等级
-- `@param swiftness? integer` 剩余生命等于或小于该百分比时，使用自然迅捷
-- `@param swiftmend? integer` 损失生命大于或等于该值时，使用迅捷治愈
+- `@param start? integer` 起始生命损失百分比；缺省为`6`
+- `@param rank? integer` 愈合法术等级；缺省为`4`
+- `@param swiftness? integer` 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
+- `@param swiftmend? integer` 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 
 逻辑描述：
 - 检验打断施法（省蓝）
@@ -78,15 +78,15 @@
 
 ```
 /script -- CastSpellByName("愈合")
-/script DaruidTree:HealRoster(2, 40, 1500)
+/script DaruidTree:HealRoster()
 ```
 
 参数列表：
-- `@param start? integer` 起始生命损失百分比
-- `@param swiftness? integer` 剩余生命等于或小于该百分比时，使用自然迅捷
-- `@param swiftmend? integer` 损失生命大于或等于该值时，使用迅捷治愈
+- `@param start? integer` 起始生命损失百分比；缺省为`2`
+- `@param swiftness? integer` 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
+- `@param swiftmend? integer` 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 
-大致逻辑：
+逻辑描述：
 - 检验打断施法（省蓝）
 - 补充名单回春术（毛治疗量）
 - 尽力治疗奶名中生命损失最多的目标
@@ -101,7 +101,7 @@
 /script DaruidTree:Roster()
 ```
 
-大致逻辑：
+逻辑描述：
 - 选择坦克（友善目标）使用宏 - 将目标加入或删除名单
 - 按住ALT使用宏 - 清空名单
 - 无目标、非友善目标使用宏 - 输出当前名单
@@ -116,10 +116,10 @@
 /script DaruidTree:EnergySaving()
 ```
 
-大致逻辑：
+逻辑描述：
 - 对附近进入战斗目标施法精灵之火（按下ALT释放最高级），以此触发节能效果
 
 
 ## 命令
 - `/sdfz tsms` - 调试模式：开启或关闭调试模式
-- `/sdfz tsdj [等级]` - 等级等级：设置或获取调试等级，等级取值范围`1~3`
+- `/sdfz tsdj [等级]` - 调试等级：设置或获取调试等级，等级取值范围`1~3`

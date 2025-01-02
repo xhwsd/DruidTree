@@ -44,7 +44,7 @@ local function InArray(array, data)
 end
 
 ---取生命损失
----@param unit? string 单位
+---@param unit? string 单位；缺省为`player`
 ---@return integer percentage 生命损失百分比
 ---@return integer lose 生命损失
 local function HealthLose(unit)
@@ -59,7 +59,7 @@ local function HealthLose(unit)
 end
 
 ---取生命剩余
----@param unit? string 单位
+---@param unit? string 单位；缺省为`player`
 ---@return integer percentage 生命剩余百分比
 ---@return integer residual 生命剩余
 local function HealthResidual(unit)
@@ -124,6 +124,26 @@ local function HealUnit(unit)
 	return UnitIsFriend("player", unit) and unit or "player"
 end
 
+---提示通知（注意）
+---@param message string 提示信息
+---@param... any 可变参数
+local function HintNotice(message, ...)
+	if arg.n then
+		message = string.format(message, unpack(arg))
+	end
+	UIErrorsFrame:AddMessage(message, 0.0, 1.0, 0.0, 53, 5)
+end
+
+---提示警告
+---@param message string 提示信息
+---@param... any 可变参数
+local function HintWarning(message, ...)
+	if arg.n then
+		message = string.format(message, unpack(arg))
+	end
+	UIErrorsFrame:AddMessage(message, 1.0, 1.0, 0.0, 53, 5)
+end
+
 ---施放法术
 ---@param spell string 法术名称；可包含等级
 ---@param unit? string 目标单位
@@ -137,22 +157,22 @@ local function CastSpell(spell, unit)
 	if unit then
 		if UnitIsUnit(unit, "player") then
 			-- 自我施法
-			UIErrorsFrame:AddMessage(string.format("对自己施放<%s>", spell), 0.0, 1.0, 0.0, 53, 5)
+			HintNotice("对自己施放<%s>", spell)
 			CastSpellByName(spell, 1)
 			return true
 		elseif targetSwitch:ToUnit(unit) then
 			-- 目标施法
-			UIErrorsFrame:AddMessage(string.format("对<%s>施放<%s>", UnitName(unit), spell), 0.0, 1.0, 0.0, 53, 5)
+			HintNotice("对<%s>施放<%s>", UnitName(unit), spell)
 			CastSpellByName(spell)
 			targetSwitch:ToLast()
 			return true
 		else
-			UIErrorsFrame:AddMessage(string.format("切换到单位<%s>施放<%s>失败", unit, spell), 1.0, 1.0, 0.0, 53, 5)
+			HintWarning("切换到单位<%s>施放<%s>失败", unit, spell)
 			return false
 		end
 	else
 		-- 未指定单位
-		UIErrorsFrame:AddMessage(string.format("施放<%s>", spell), 0.0, 1.0, 0.0, 53, 5)
+		HintWarning("施放<%s>", spell)
 		CastSpellByName(spell)
 		return true
 	end
@@ -202,7 +222,7 @@ function DaruidTree:OnDisable()
 end
 
 ---打断治疗
----@param start? integer 起始生命损失百分比
+---@param start? integer 起始生命损失百分比；缺省为`0`
 ---@return boolean stop 已打断返回真，未打断返回假
 function DaruidTree:StopHeal(start)
 	start = start or 0
@@ -241,7 +261,7 @@ function DaruidTree:StopHeal(start)
 end
 
 ---检验单位可否治疗
----@param unit? string 治疗单位
+---@param unit? string 治疗单位；缺省为`player`
 ---@return boolean can 是否可治疗
 function DaruidTree:CanHeal(unit)
 	unit = unit or "player"
@@ -284,7 +304,7 @@ function DaruidTree:CanHeal(unit)
 	-- 取动作插槽
 	local slot = spellSlot:FindSpell("愈合", "回春术", "治疗之触")
 	if not slot then
-		self:LevelDebug(2, "可否治疗，未匹配到插槽")
+		self:LevelDebug(2, "可否治疗，未在动作条找到40码法术")
 		-- 让法术判断
 		return true
 	end
@@ -302,9 +322,9 @@ function DaruidTree:CanHeal(unit)
 end
 
 -- 过量治疗单位
----@param unit? string 目标单位
----@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
----@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@param unit? string 目标单位；缺省为`HealUnit(unit)`
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
 function DaruidTree:OverdoseHeal(unit, swiftness, swiftmend)
 	unit = HealUnit(unit)
@@ -335,11 +355,11 @@ function DaruidTree:OverdoseHeal(unit, swiftness, swiftmend)
 end
 
 ---节省治疗单位
----@param unit? string 目标单位
----@param start? integer 起始生命损失百分比
----@param rank? integer 愈合法术等级
----@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
----@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@param unit? string 目标单位；缺省为`HealUnit(unit)`
+---@param start? integer 起始生命损失百分比；缺省为`6`
+---@param rank? integer 愈合法术等级；缺省为`4`
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
 function DaruidTree:EconomizeHeal(unit, start, rank, swiftness, swiftmend)
 	unit = HealUnit(unit)
@@ -376,9 +396,9 @@ function DaruidTree:EconomizeHeal(unit, start, rank, swiftness, swiftmend)
 end
 
 ---尽力治疗单位
----@param unit? string 目标单位
----@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
----@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@param unit? string 目标单位；缺省为`HealUnit(unit)`
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
 function DaruidTree:EndeavorHeal(unit, swiftness, swiftmend)
 	unit = HealUnit(unit)
@@ -415,7 +435,7 @@ function DaruidTree:EndeavorHeal(unit, swiftness, swiftmend)
 end
 
 ---查找队伍中损失最多单位
----@param start? integer 起始损失百分比
+---@param start? integer 起始损失百分比；缺省为`4`
 ---@return string|nil target 已找到返回单位，未找到否则返回空
 function DaruidTree:FindParty(start)
 	start = start or 4
@@ -442,7 +462,7 @@ function DaruidTree:FindParty(start)
 end
 
 -- 查找团队中损失最多单位
----@param start? integer 起始生命损失百分比
+---@param start? integer 起始生命损失百分比；缺省为`6`
 ---@return string|nil target 已找到返回单位，未找到否则返回空
 function DaruidTree:FindRaid(start)
 	start = start or 6
@@ -461,7 +481,7 @@ function DaruidTree:FindRaid(start)
 end
 
 ---查找名单中损失最多名称
----@param start? integer 起始生命损失百分比
+---@param start? integer 起始生命损失百分比；缺省为`2`
 ---@return string|nil target 已找到返回单位，未找到否则返回空
 function DaruidTree:FindRoster(start)
 	start = start or 2
@@ -491,8 +511,8 @@ function DaruidTree:FindRoster(start)
 end
 
 ---补充名单增益
----@param buff? string 增益名称
----@param spell? string 法术名称
+---@param buff? string 增益名称；缺省为`回春术`
+---@param spell? string 法术名称；缺省为`buff`
 ---@return string|nil target 已补返回名称，未补返回空
 function DaruidTree:AddedBuff(buff, spell)
 	buff = buff or "回春术"
@@ -523,8 +543,8 @@ function DaruidTree:AddedBuff(buff, spell)
 end
 
 ---尝试治疗选择目标
----@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
----@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
 function DaruidTree:HealSelect(swiftness, swiftmend)
 	swiftness = swiftness or 40
@@ -536,7 +556,7 @@ function DaruidTree:HealSelect(swiftness, swiftmend)
 		if self:OverdoseHeal(HealUnit(), swiftness, swiftmend) then
 			return true
 		else
-			UIErrorsFrame:AddMessage("选择暂无损失", 1.0, 1.0, 0.0, 53, 5)
+			HintWarning("选择暂无损失")
 		end
 	else
 		-- 打断治疗
@@ -548,16 +568,16 @@ function DaruidTree:HealSelect(swiftness, swiftmend)
 		if self:EndeavorHeal(HealUnit(), swiftness, swiftmend) then
 			return true
 		else
-			UIErrorsFrame:AddMessage("选择暂无损失", 1.0, 1.0, 0.0, 53, 5)
+			HintWarning("选择暂无损失")
 		end
 	end
 	return false
 end
 
 ---尝试尽力治疗队伍中生命损失最多的目标
----@param start? integer 起始生命损失百分比
----@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
----@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@param start? integer 起始生命损失百分比；缺省为`4`
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
 function DaruidTree:HealParty(start, swiftness, swiftmend)
 	start = start or 4
@@ -575,16 +595,16 @@ function DaruidTree:HealParty(start, swiftness, swiftmend)
 		-- 尽力治疗
 		return self:EndeavorHeal(unit, swiftness, swiftmend)
 	else
-		UIErrorsFrame:AddMessage(string.format("队伍暂无损失(%s)", start), 1.0, 1.0, 0.0, 53, 5)
+		HintWarning("队伍暂无损失(%s)", start)
 	end
 	return false
 end
 
 ---尝试节约治疗团队中生命损失最多的目标
----@param start? integer 起始生命损失百分比
----@param rank? integer 愈合法术等级
----@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
----@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@param start? integer 起始生命损失百分比；缺省为`6`
+---@param rank? integer 愈合法术等级；缺省为`4`
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
 function DaruidTree:HealRaid(start, rank, swiftness, swiftmend)
 	start = start or 6
@@ -603,15 +623,15 @@ function DaruidTree:HealRaid(start, rank, swiftness, swiftmend)
 		-- 节约治疗
 		return self:EconomizeHeal(unit, start, rank, swiftness, swiftmend)
 	else
-		UIErrorsFrame:AddMessage(string.format("团队暂无损失(%s)", start), 1.0, 1.0, 0.0, 53, 5)
+		HintWarning("团队暂无损失(%s)", start)
 	end
 	return false
 end
 
 ---尝试治疗名单、团队、队伍、选择中生命损失最多的目标
----@param start? integer 起始生命损失百分比
----@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷
----@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈
+---@param start? integer 起始生命损失百分比；缺省为`2`
+---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
+---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
 function DaruidTree:HealRoster(start, swiftness, swiftmend)
 	start = start or 2
@@ -651,7 +671,7 @@ function DaruidTree:HealRoster(start, swiftness, swiftmend)
 		-- 治疗选择
 		return true
 	else
-		UIErrorsFrame:AddMessage(string.format("名单暂无损失(%s)", start), 1.0, 1.0, 0.0, 53, 5)
+		HintWarning("名单暂无损失(%s)", start)
 	end
 	return false
 end
@@ -711,6 +731,6 @@ function DaruidTree:EnergySaving()
 			TargetNearestEnemy()
 		end
 	else
-		UIErrorsFrame:AddMessage("节能已存在！", 1.0, 1.0, 0.0, 53, 5)
+		HintWarning("节能已存在！")
 	end
 end
