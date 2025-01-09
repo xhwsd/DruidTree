@@ -6,8 +6,8 @@
 
 ## 使用
 - 安装`!Libs`插件
-- 可选的，安装[SuperMacro](https://ghgo.xyz/https://github.com/xhwsd/SuperMacro/archive/master.zip)插件
-- 安装[DaruidTree](https://ghgo.xyz/https://github.com/xhwsd/DaruidTree/archive/master.zip)插件
+- [可选][[文档](https://github.com/xhwsd/SuperMacro/)][[下载](https://ghgo.xyz/https://github.com/xhwsd/SuperMacro/archive/master.zip)]安装`SuperMacro`插件
+- [[文档](https://github.com/xhwsd/DaruidTree/)][[下载](https://ghgo.xyz/https://github.com/xhwsd/DaruidTree/archive/master.zip)]安装`DaruidTree`插件
 - 基于插件提供的函数，创建普通或超级宏
 - 将宏图标拖至动作条，然后使用宏
 
@@ -88,9 +88,11 @@
 
 逻辑描述：
 - 检验打断施法（省蓝）
-- 补充名单回春术（毛治疗量）
+- 补充名单回春术
 - 尽力治疗奶名中生命损失最多的目标
 - 如果名单无损失目标，将尝试奶团（在团）、奶队（在队）、奶选
+
+> 总结：保持多坦克满级回春，优先尽力治疗坦克，然后用低级愈合治疗其它。注意该宏是主用宏，其它宏看情况抉择。
 
 
 ### 名单
