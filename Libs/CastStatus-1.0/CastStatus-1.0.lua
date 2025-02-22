@@ -133,6 +133,11 @@ end
 function CastStatus:UseAction(slotId, checkCursor, onSelf)
 	-- self:LevelDebug(3, "UseAction", slotId, checkCursor, onSelf)
 	self.hooks.UseAction(slotId, checkCursor, onSelf)
+	
+	-- 空插槽
+	if not HasAction(slotId) then
+		return
+	end
 
 	-- 宏有文本
 	if GetActionText(slotId) then

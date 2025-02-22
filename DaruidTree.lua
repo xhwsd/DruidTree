@@ -126,7 +126,7 @@ end
 
 ---提示通知（注意）
 ---@param message string 提示信息
----@param... any 可变参数
+---@param ... any 可变参数
 local function HintNotice(message, ...)
 	if arg.n then
 		message = string.format(message, unpack(arg))
@@ -136,7 +136,7 @@ end
 
 ---提示警告
 ---@param message string 提示信息
----@param... any 可变参数
+---@param ... any 可变参数
 local function HintWarning(message, ...)
 	if arg.n then
 		message = string.format(message, unpack(arg))
