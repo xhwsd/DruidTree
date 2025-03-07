@@ -1,5 +1,5 @@
 ## Interface: 11200
-## Title: DaruidTree 树德
+## Title: DruidTree
 ## Title-zhCN: |CFF33AAFF[德鲁伊]|R树德辅助插件
 ## Notes-zhCN: 适配乌龟服的树德辅助插件
 ## Author: xhwsd@qq.com
@@ -12,4 +12,4 @@ Libs\SpellSlot-1.0\SpellSlot-1.0.lua
 Libs\TargetSwitch-1.0\TargetSwitch-1.0.lua
 Libs\CastStatus-1.0\CastStatus-1.0.lua 
 
-DaruidTree.lua
+DruidTree.lua

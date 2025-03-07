@@ -5,7 +5,7 @@ if playerClass ~= "DRUID" then
 end
 
 -- 定义插件
-DaruidTree = AceLibrary("AceAddon-2.0"):new(
+DruidTree = AceLibrary("AceAddon-2.0"):new(
 	-- 控制台
 	"AceConsole-2.0",
 	-- 调试
@@ -179,7 +179,7 @@ local function CastSpell(spell, unit)
 end
 
 ---插件载入
-function DaruidTree:OnInitialize()
+function DruidTree:OnInitialize()
 	-- 精简标题
 	self.title = "树德辅助"
 	-- 开启调试
@@ -189,11 +189,11 @@ function DaruidTree:OnInitialize()
 end
 
 ---插件打开
-function DaruidTree:OnEnable()
+function DruidTree:OnEnable()
 	self:LevelDebug(3, "插件打开")
 
 	-- 注册命令
-	self:RegisterChatCommand({"/SDFZ", '/DaruidTree'}, {
+	self:RegisterChatCommand({"/SDFZ", '/DruidTree'}, {
 		type = "group",
 		args = {
 			tsms = {
@@ -217,14 +217,14 @@ function DaruidTree:OnEnable()
 end
 
 ---插件关闭
-function DaruidTree:OnDisable()
+function DruidTree:OnDisable()
 	self:LevelDebug(3, "插件关闭")
 end
 
 ---打断治疗
 ---@param start? integer 起始生命损失百分比；缺省为`0`
 ---@return boolean stop 已打断返回真，未打断返回假
-function DaruidTree:StopHeal(start)
+function DruidTree:StopHeal(start)
 	start = start or 0
 
 	-- 正在施法中
@@ -264,7 +264,7 @@ end
 ---检验单位可否治疗
 ---@param unit? string 治疗单位；缺省为`player`
 ---@return boolean can 是否可治疗
-function DaruidTree:CanHeal(unit)
+function DruidTree:CanHeal(unit)
 	unit = unit or "player"
 
 	-- 单位不存在
@@ -327,7 +327,7 @@ end
 ---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
 ---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
-function DaruidTree:OverdoseHeal(unit, swiftness, swiftmend)
+function DruidTree:OverdoseHeal(unit, swiftness, swiftmend)
 	unit = HealUnit(unit)
 	swiftness = swiftness or 40
 	swiftmend = swiftmend or 1500
@@ -362,7 +362,7 @@ end
 ---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
 ---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
-function DaruidTree:EconomizeHeal(unit, start, rank, swiftness, swiftmend)
+function DruidTree:EconomizeHeal(unit, start, rank, swiftness, swiftmend)
 	unit = HealUnit(unit)
 	start = start or 6
 	rank = rank or 4
@@ -401,7 +401,7 @@ end
 ---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
 ---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
-function DaruidTree:EndeavorHeal(unit, swiftness, swiftmend)
+function DruidTree:EndeavorHeal(unit, swiftness, swiftmend)
 	unit = HealUnit(unit)
 	swiftness = swiftness or 40
 	swiftmend = swiftmend or 1500
@@ -438,7 +438,7 @@ end
 ---查找队伍中损失最多单位
 ---@param start? integer 起始损失百分比；缺省为`4`
 ---@return string|nil target 已找到返回单位，未找到否则返回空
-function DaruidTree:FindParty(start)
+function DruidTree:FindParty(start)
 	start = start or 4
 
 	-- 检验自己（优先）
@@ -465,7 +465,7 @@ end
 -- 查找团队中损失最多单位
 ---@param start? integer 起始生命损失百分比；缺省为`6`
 ---@return string|nil target 已找到返回单位，未找到否则返回空
-function DaruidTree:FindRaid(start)
+function DruidTree:FindRaid(start)
 	start = start or 6
 
 	-- 团队查找
@@ -484,7 +484,7 @@ end
 ---查找名单中损失最多名称
 ---@param start? integer 起始生命损失百分比；缺省为`2`
 ---@return string|nil target 已找到返回单位，未找到否则返回空
-function DaruidTree:FindRoster(start)
+function DruidTree:FindRoster(start)
 	start = start or 2
 
 	-- 名单查找
@@ -515,7 +515,7 @@ end
 ---@param buff? string 增益名称；缺省为`回春术`
 ---@param spell? string 法术名称；缺省为`buff`
 ---@return string|nil target 已补返回名称，未补返回空
-function DaruidTree:AddedBuff(buff, spell)
+function DruidTree:AddedBuff(buff, spell)
 	buff = buff or "回春术"
 	spell = spell or buff
 
@@ -547,7 +547,7 @@ end
 ---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
 ---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
-function DaruidTree:HealSelect(swiftness, swiftmend)
+function DruidTree:HealSelect(swiftness, swiftmend)
 	swiftness = swiftness or 40
 	swiftmend = swiftmend or 1500
 
@@ -580,7 +580,7 @@ end
 ---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
 ---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
-function DaruidTree:HealParty(start, swiftness, swiftmend)
+function DruidTree:HealParty(start, swiftness, swiftmend)
 	start = start or 4
 	swiftness = swiftness or 40
 	swiftmend = swiftmend or 1500
@@ -607,7 +607,7 @@ end
 ---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
 ---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
-function DaruidTree:HealRaid(start, rank, swiftness, swiftmend)
+function DruidTree:HealRaid(start, rank, swiftness, swiftmend)
 	start = start or 6
 	rank = rank or 4
 	swiftness = swiftness or 40
@@ -634,7 +634,7 @@ end
 ---@param swiftness? integer 剩余生命等于或小于该百分比时，使用自然迅捷；缺省为`40`
 ---@param swiftmend? integer 损失生命大于或等于该值时，使用迅捷治愈；缺省为`1500`
 ---@return boolean success 成功返回真，否则返回假
-function DaruidTree:HealRoster(start, swiftness, swiftmend)
+function DruidTree:HealRoster(start, swiftness, swiftmend)
 	start = start or 2
 	swiftness = swiftness or 40
 	swiftmend = swiftmend or 1500
@@ -678,7 +678,7 @@ function DaruidTree:HealRoster(start, swiftness, swiftmend)
 end
 
 ---将目标加入或移除名单
-function DaruidTree:Roster()
+function DruidTree:Roster()
 	if IsAltKeyDown() then
 		-- 名单清空
 		rosters = {}
@@ -713,7 +713,7 @@ function DaruidTree:Roster()
 end
 
 ---节能：对附近进入战斗目标施法精灵之火（按下ALT释放最高级），以此触发节能效果
-function DaruidTree:EnergySaving()
+function DruidTree:EnergySaving()
 	-- 打断施法
 	SpellStopCasting()
 

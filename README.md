@@ -7,7 +7,7 @@
 ## 使用
 - 安装`!Libs`插件
 - [可选][[文档](https://github.com/xhwsd/SuperMacro/)][[下载](https://ghfast.top/https://github.com/xhwsd/SuperMacro/archive/master.zip)]安装`SuperMacro`插件，安装后将获得更多宏位
-- [[文档](https://github.com/xhwsd/DaruidTree/)][[下载](https://ghfast.top/https://github.com/xhwsd/DaruidTree/archive/master.zip)]安装`DaruidTree`插件
+- [[文档](https://github.com/xhwsd/DruidTree/)][[下载](https://ghfast.top/https://github.com/xhwsd/DruidTree/archive/master.zip)]安装`DruidTree`插件
 - 基于插件提供的函数，创建普通或超级宏
 - 将宏图标拖至动作条，然后使用宏
 
@@ -25,7 +25,7 @@
 
 ```
 /script -- CastSpellByName("愈合")
-/script DaruidTree:HealSelect()
+/script DruidTree:HealSelect()
 ```
 
 逻辑描述：
@@ -39,7 +39,7 @@
 
 ```
 /script -- CastSpellByName("愈合")
-/script DaruidTree:HealParty()
+/script DruidTree:HealParty()
 ```
 
 参数列表：
@@ -58,7 +58,7 @@
 
 ```
 /script -- CastSpellByName("愈合")
-/script DaruidTree:HealRaid()
+/script DruidTree:HealRaid()
 ```
 
 参数列表：
@@ -78,7 +78,7 @@
 
 ```
 /script -- CastSpellByName("愈合")
-/script DaruidTree:HealRoster()
+/script DruidTree:HealRoster()
 ```
 
 参数列表：
@@ -100,7 +100,7 @@
 > 将目标加入或移除名单
 
 ```
-/script DaruidTree:Roster()
+/script DruidTree:Roster()
 ```
 
 逻辑描述：
@@ -115,7 +115,7 @@
 
 ```
 /script -- CastSpellByName("精灵之火")
-/script DaruidTree:EnergySaving()
+/script DruidTree:EnergySaving()
 ```
 
 逻辑描述：
