@@ -6,8 +6,8 @@
 
 ## 使用
 - 安装`!Libs`插件
-- [可选][[文档](https://github.com/xhwsd/SuperMacro/)][[下载](https://ghfast.top/https://github.com/xhwsd/SuperMacro/archive/master.zip)]安装`SuperMacro`插件，安装后将获得更多宏位
-- [[文档](https://github.com/xhwsd/DruidTree/)][[下载](https://ghfast.top/https://github.com/xhwsd/DruidTree/archive/master.zip)]安装`DruidTree`插件
+- [可选][[文档](https://github.com/xhwsd/SuperMacro/)][[下载](https://github.com/xhwsd/SuperMacro/archive/master.zip)]安装`SuperMacro`插件，安装后将获得更多宏位
+- [[文档](https://github.com/xhwsd/DruidTree/)][[下载](https://github.com/xhwsd/DruidTree/archive/main.zip)]安装`DruidTree`插件
 - 基于插件提供的函数，创建普通或超级宏
 - 将宏图标拖至动作条，然后使用宏
 
@@ -128,4 +128,4 @@
 
 
 ## 参考天赋
-![参考天赋](/参考天赋/2025-1-3.png)
+![参考天赋](/Talent.png)
