@@ -3,7 +3,7 @@
 > __自娱自乐，不做任何保证！__  
 > 如遇到BUG可反馈至 xhwsd@qq.com 邮箱
 
-<img src="Preview.png" style="zoom:50%;" />
+<img src="Preview.png" style="height: 500px; width: auto;" />
 
 
 ## 使用
@@ -97,4 +97,4 @@
 
 
 ## 参考天赋
-<img src="Talent.png" style="zoom:70%;" />
+<img src="Talent.png" style="height: 70%; width: auto;" />
