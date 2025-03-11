@@ -1,18 +1,18 @@
 --[[
-Name: EffectCheck-1.0
+Name: Wsd-Effect-1.0
 Revision: $Rev: 10220 $
 Author(s): xhwsd
 Website: https://github.com/xhwsd
-Description: 效果检查相关操作库。
+Description: 效果相关操作库。
 Dependencies: AceLibrary
 ]]
 
 -- 主要版本
-local MAJOR_VERSION = "EffectCheck-1.0"
---次要版本
+local MAJOR_VERSION = "Wsd-Effect-1.0"
+-- 次要版本
 local MINOR_VERSION = "$Revision: 10220 $"
 
--- 检验 AceLibrary
+-- 检验AceLibrary
 if not AceLibrary then
 	error(MAJOR_VERSION .. " requires AceLibrary")
 end
@@ -22,10 +22,11 @@ if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
 	return
 end
 
--- 创建库对象
-local EffectCheck = {}
+-- 效果相关操作库。
+---@class Wsd-Effect-1.0
+local Library = {}
 
----库激活
+-- 库激活
 ---@param self table 库自身对象
 ---@param oldLib table 旧版库对象
 ---@param oldDeactivate function 旧版库停用函数
@@ -33,7 +34,7 @@ local function activate(self, oldLib, oldDeactivate)
 
 end
 
----外部库加载
+-- 外部库加载
 ---@param self table 库自身对象
 ---@param major string 外部库主版本
 ---@param instance table 外部库实例
@@ -41,15 +42,15 @@ local function external(self, major, instance)
 
 end
 
-------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
----查找单位效果名称
+-- 查找单位效果名称
 ---@param name string 效果名称
 ---@param unit? string 目标单位；额外还支持`mainhand`、`offhand`；缺省为`player`
 ---@return string kind 效果类型；可选值：`mainhand`、`offhand`、`buff`、`debuff`
 ---@return integer index 效果索引；从1开始
 ---@return string text 效果文本
-function EffectCheck:FindName(name, unit)
+function Library:FindName(name, unit)
 	unit = unit or "player"
 
 	if not name then
@@ -105,18 +106,8 @@ function EffectCheck:FindName(name, unit)
 	end
 end
 
----查找单位效果图标
----@param icon string 效果图标
----@param unit string 目标单位；额外还支持`mainhand`、`offhand`
----@return string kind 效果类型；可选值：`mainhand`、`offhand`、`buff`、`debuff`
----@return integer index 效果索引；从1开始
----@return string text 效果文本
-function EffectCheck:FindIcon(icon, unit)
-	
-end
-
-------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 -- 最终注册库
-AceLibrary:Register(EffectCheck, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
-EffectCheck = nil
+AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
+Library = nil

@@ -1,5 +1,5 @@
 --[[
-Name: SpellSlot-1.0
+Name: Wsd-Slot-1.0
 Revision: $Rev: 10001 $
 Author(s): xhwsd
 Website: https://github.com/xhwsd
@@ -8,11 +8,11 @@ Dependencies: AceLibrary, Gratuity-2.0, SpellCache-1.0
 ]]
 
 -- 主要版本
-local MAJOR_VERSION = "SpellSlot-1.0"
+local MAJOR_VERSION = "Wsd-Slot-1.0"
 --次要版本
 local MINOR_VERSION = "$Revision: 10001 $"
 
--- 检验 AceLibrary
+-- 检验AceLibrary
 if not AceLibrary then
 	error(MAJOR_VERSION .. " requires AceLibrary")
 end
@@ -22,10 +22,10 @@ if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
 	return
 end
 
----检查依赖库
+-- 检查依赖库
 ---@param dependencies table 依赖库名称列表
 local function CheckDependency(dependencies)
-	for index, value in ipairs(dependencies) do
+	for _, value in ipairs(dependencies) do
 		if not AceLibrary:HasInstance(value) then 
 			error(format("%s requires %s to function properly", MAJOR_VERSION, value))
 		end
@@ -40,13 +40,14 @@ CheckDependency({
 })
 
 -- 引入依赖库
-local gratuity = AceLibrary("Gratuity-2.0")
-local spellCache = AceLibrary("SpellCache-1.0")
+local Gratuity = AceLibrary("Gratuity-2.0")
+local SpellCache = AceLibrary("SpellCache-1.0")
 
--- 创建库对象
-local SpellSlot = {}
+-- 法术插槽相关操作库。
+---@class Wsd-Slot-1.0
+local Library = {}
 
----库激活
+-- 库激活
 ---@param self table 库自身对象
 ---@param oldLib table 旧版库对象
 ---@param oldDeactivate function 旧版库停用函数
@@ -54,7 +55,7 @@ local function activate(self, oldLib, oldDeactivate)
 
 end
 
----外部库加载
+-- 外部库加载
 ---@param self table 库自身对象
 ---@param major string 外部库主版本
 ---@param instance table 外部库实例
@@ -62,26 +63,26 @@ local function external(self, major, instance)
 
 end
 
-------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 -- 法术缓存
 local spellCaches = {}
 
----检验值是否包含于索引数组中
----@param array table 数组(索引表）
----@param value any 值
+-- 检验值是否包含于索引数组中
+---@param list any 列表
+---@param data any 值
 ---@return integer index 返回索引
-local function InArray(array, value)
-	if type(array) == "table" then
-		for index, data in ipairs(array) do
-			if data == value then
+local function InList(list, data)
+	if type(list) == "table" then
+		for index, value in ipairs(list) do
+			if value == data then
 				return index
 			end
 		end
 	end
 end
 
----取插槽法术图标
+-- 取插槽法术图标
 ---@param slot integer 插槽索引
 ---@return string icon 图标纹理
 local function GetSpellIcon(slot)
@@ -91,35 +92,37 @@ local function GetSpellIcon(slot)
 	end
 end
 
----检验插槽是否为宏
+-- 检验插槽是否为宏
 ---@param slot integer 插槽索引；从1开始
 ---@return boolean is 是否为宏
-function SpellSlot:IsMacro(slot)
+function Library:IsMacro(slot)
 	return slot and HasAction(slot) and GetActionText(slot) ~= nil
 end
 
----检验插槽是否法术（非宏）
+-- 检验插槽是否法术（非宏）
 ---@param slot integer 插槽索引；从1开始
 ---@return boolean is 是否为法术
-function SpellSlot:IsSpell(slot)
+function Library:IsSpell(slot)
 	return slot and HasAction(slot) and not GetActionText(slot)
 end
 
----取插槽法术信息
+-- 取插槽法术信息
 ---@param slot integer 插槽索引；从1开始
 ---@return string name 法术名称
 ---@return integer rank 法术等级
 ---@return integer id 法术索引；从1开始
-function SpellSlot:GetSpell(slot)
+function Library:GetSpell(slot)
 	-- 仅限法术插槽
 	if self:IsSpell(slot) then
 		-- 取提示文本
-		gratuity:SetAction(slot)
-		local spellName, spellRank = gratuity:GetLine(1), gratuity:GetLine(1, true)
-
-		-- 取法术数据
-		local sName, _, sId, _, sRank = spellCache:GetSpellData(spellName, spellRank)
-		return spellName or sName, sRank or spellRank, sId
+		Gratuity:SetAction(slot)
+		local spellName, spellRank = Gratuity:GetLine(1), Gratuity:GetLine(1, true)
+		
+		if spellName then
+			-- 取法术数据
+			local sName, _, sId, _, sRank = SpellCache:GetSpellData(spellName, spellRank)
+			return spellName or sName, sRank or spellRank, sId
+		end
 	end
 end
 
@@ -128,7 +131,7 @@ end
 ---@return integer slot 插槽索引；1~120
 ---@return string name 法术名称
 ---@return string icon 图标纹理
-function SpellSlot:FindSpell(...)
+function Library:FindSpell(...)
 	-- 检验法术
 	if arg.n == 0 then
 		return
@@ -159,7 +162,7 @@ function SpellSlot:FindSpell(...)
 		end
 
 		-- 缓存图标
-		if InArray(arg, spell) and not spellCaches[spell] then
+		if InList(arg, spell) and not spellCaches[spell] then
 			local icon = GetSpellTexture(index, BOOKTYPE_SPELL)
 			if icon then
 				spellCaches[spell] = {icon = icon}
@@ -170,7 +173,7 @@ function SpellSlot:FindSpell(...)
 		index = index + 1
 	end
 
-	--- 准备法术插槽
+	-- -准备法术插槽
 	for index = 1, 120 do
 		local icon = GetSpellIcon(index)
 		if icon then
@@ -186,7 +189,7 @@ function SpellSlot:FindSpell(...)
 			-- 缓存插槽
 			if spell then
 				spellCaches[spell].slot = index
-				if InArray(arg, spell) then
+				if InList(arg, spell) then
 					return index, spell, icon
 				end
 			end
@@ -194,8 +197,8 @@ function SpellSlot:FindSpell(...)
 	end
 end
 
-------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 -- 最终注册库
-AceLibrary:Register(SpellSlot, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
-SpellSlot = nil
+AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
+Library = nil

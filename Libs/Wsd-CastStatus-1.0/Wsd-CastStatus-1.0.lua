@@ -1,5 +1,5 @@
 --[[
-Name: CastStatus-1.0
+Name: Wsd-CastStatus-1.0
 Revision: $Rev: 10001 $
 Author(s): xhwsd
 Website: https://github.com/xhwsd
@@ -8,11 +8,11 @@ Dependencies: AceLibrary, AceEvent-2.0, AceHook-2.1, SpellCache-1.0, Gratuity-2.
 ]]
 
 -- 主要版本
-local MAJOR_VERSION = "CastStatus-1.0"
---次要版本
+local MAJOR_VERSION = "Wsd-CastStatus-1.0"
+-- 次要版本
 local MINOR_VERSION = "$Revision: 10001 $"
 
--- 检验 AceLibrary
+-- 检验AceLibrary
 if not AceLibrary then
 	error(MAJOR_VERSION .. " requires AceLibrary")
 end
@@ -22,10 +22,10 @@ if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
 	return
 end
 
----检查依赖库
+-- 检查依赖库
 ---@param dependencies table 依赖库名称列表
 local function CheckDependency(dependencies)
-	for index, value in ipairs(dependencies) do
+	for _, value in ipairs(dependencies) do
 		if not AceLibrary:HasInstance(value) then 
 			error(format("%s requires %s to function properly", MAJOR_VERSION, value))
 		end
@@ -44,19 +44,20 @@ CheckDependency({
 })
 
 -- 引入依赖库
-local spellCache = AceLibrary("SpellCache-1.0")
+local SpellCache = AceLibrary("SpellCache-1.0")
 -- 提示解析
-local gratuity = AceLibrary("Gratuity-2.0")
+local Gratuity = AceLibrary("Gratuity-2.0")
 
--- 创建库对象
-local CastStatus = {}
+-- 施法状态相关操作库。
+---@class Wsd-CastStatus-1.0
+local Library = {}
 
----库激活
+-- 库激活
 ---@param self table 库自身对象
 ---@param oldLib table 旧版库对象
 ---@param oldDeactivate function 旧版库停用函数
 local function activate(self, oldLib, oldDeactivate)
-	CastStatus = self
+	Library = self
 
 	if oldLib then
 		oldLib:UnregisterAllEvents()
@@ -69,7 +70,7 @@ local function activate(self, oldLib, oldDeactivate)
 	end
 end
 
----外部库加载
+-- 外部库加载
 ---@param self table 库自身对象
 ---@param major string 外部库主版本
 ---@param instance table 外部库实例
@@ -91,6 +92,7 @@ local function external(self, major, instance)
 		self:Hook("UseAction")
 		self:Hook("CastSpell")
 		self:Hook("CastSpellByName")
+
 		-- self:Hook("SpellTargetUnit")
 		-- self:Hook("SpellStopTargeting")
 		-- self:Hook("TargetUnit")
@@ -98,7 +100,7 @@ local function external(self, major, instance)
 	end
 end
 
-------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 -- 施法
 local cast = {
@@ -110,27 +112,27 @@ local cast = {
 	casting = false,
 }
 
----施法开始
-function CastStatus:SPELLCAST_START()
+-- 施法开始
+function Library:SPELLCAST_START()
 	cast.casting = true
 	cast.spell = arg1
 	-- self:LevelDebug(3, "施法开始；法术：%s；目标：%s", cast.spell, cast.target)
 end
 
----施法停止
-function CastStatus:SPELLCAST_STOP()
+-- 施法停止
+function Library:SPELLCAST_STOP()
 	cast.casting = false
 	-- self:LevelDebug(3, "施法停止；法术：%s；目标：%s", cast.spell, cast.target)
 end
 
----施法失败
-function CastStatus:SPELLCAST_FAILED()
+-- 施法失败
+function Library:SPELLCAST_FAILED()
 	cast.casting = false
 	-- self:LevelDebug(3, "施法失败；法术：%s；目标：%s", cast.spell, cast.target)
 end
 
----使用动作条
-function CastStatus:UseAction(slotId, checkCursor, onSelf)
+-- 使用动作条
+function Library:UseAction(slotId, checkCursor, onSelf)
 	-- self:LevelDebug(3, "UseAction", slotId, checkCursor, onSelf)
 	self.hooks.UseAction(slotId, checkCursor, onSelf)
 	
@@ -150,16 +152,16 @@ function CastStatus:UseAction(slotId, checkCursor, onSelf)
 	end
 
 	-- 法术名称
-	gratuity:SetAction(slotId)
-	local spell = spellCache:GetSpellData(gratuity:GetLine(1), gratuity:GetLine(1, true))
+	Gratuity:SetAction(slotId)
+	local spell = SpellCache:GetSpellData(Gratuity:GetLine(1), Gratuity:GetLine(1, true))
 	-- 目标单位
 	local unit = onSelf and "player" or (UnitExists("target") and "target" or "player") 
 	-- 处理施法
 	self:HandleCast(spell, unit)
 end
 
----施展法术
-function CastStatus:CastSpell(spellId, spellbookType)
+-- 施展法术
+function Library:CastSpell(spellId, spellbookType)
 	-- self:LevelDebug(3, "CastSpell", spellId, spellbookType)
 	self.hooks.CastSpell(spellId, spellbookType)
 
@@ -176,8 +178,8 @@ function CastStatus:CastSpell(spellId, spellbookType)
 	self:HandleCast(spell, unit)
 end
 
----按名称施展法术
-function CastStatus:CastSpellByName(spellName, onSelf)
+-- 按名称施展法术
+function Library:CastSpellByName(spellName, onSelf)
 	-- self:LevelDebug(3, "CastSpellByName", spellName, onSelf)
 	self.hooks.CastSpellByName(spellName, onSelf)
 
@@ -187,49 +189,49 @@ function CastStatus:CastSpellByName(spellName, onSelf)
 	end
 
 	-- 法术名称
-	local spell = spellCache:GetSpellData(spellName)
+	local spell = SpellCache:GetSpellData(spellName)
 	-- 目标单位
 	local unit = onSelf and "player" or (UnitExists("target") and "target" or "player") 
 	-- 处理施法
 	self:HandleCast(spell, unit)
 end
 
----处理施法
+-- 处理施法
 ---@param spell string 法术名称
 ---@param unit string 目标单位
-function CastStatus:HandleCast(spell, unit)
+function Library:HandleCast(spell, unit)
 	cast.spell = spell
 	cast.target = UnitName(unit)
 end
 
----取施法状态
+-- 取施法状态
 ---@return boolean casting 是否在施法中
 ---@return string spell 施法名称
 ---@return string target 施法目标
-function CastStatus:GetStatus()
+function Library:GetStatus()
 	return cast.casting, cast.spell, cast.target
 end
 
----是否在施法中
+-- 是否在施法中
 ---@return boolean casting 是否在施法中
-function CastStatus:IsCasting()
+function Library:IsCasting()
 	return cast.casting
 end
 
----取施法名称
+-- 取施法名称
 ---@return string spell 施法名称
-function CastStatus:GetSpell()
+function Library:GetSpell()
 	return cast.spell
 end
 
----取施法目标
+-- 取施法目标
 ---@return string target 施法目标
-function CastStatus:GetTarget()
+function Library:GetTarget()
 	return cast.target
 end
 
-------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 -- 最终注册库
-AceLibrary:Register(CastStatus, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
-CastStatus = nil
+AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
+Library = nil

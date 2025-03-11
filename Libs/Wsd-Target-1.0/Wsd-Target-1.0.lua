@@ -1,5 +1,5 @@
 --[[
-Name: TargetSwitch-1.0
+Name: Wsd-Target-1.0
 Revision: $Rev: 10220 $
 Author(s): xhwsd
 Website: https://github.com/xhwsd
@@ -8,11 +8,11 @@ Dependencies: AceLibrary
 ]]
 
 -- 主要版本
-local MAJOR_VERSION = "TargetSwitch-1.0"
---次要版本
+local MAJOR_VERSION = "Wsd-Target-1.0"
+-- 次要版本
 local MINOR_VERSION = "$Revision: 10220 $"
 
--- 检验 AceLibrary
+-- 检验AceLibrary
 if not AceLibrary then
 	error(MAJOR_VERSION .. " requires AceLibrary")
 end
@@ -22,10 +22,11 @@ if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
 	return
 end
 
--- 创建库对象
-local TargetSwitch = {}
+-- 目标切换相关操作库。
+---@class Wsd-Target-1.0
+local Library = {}
 
----库激活
+-- 库激活
 ---@param self table 库自身对象
 ---@param oldLib table 旧版库对象
 ---@param oldDeactivate function 旧版库停用函数
@@ -33,7 +34,7 @@ local function activate(self, oldLib, oldDeactivate)
 
 end
 
----外部库加载
+-- 外部库加载
 ---@param self table 库自身对象
 ---@param major string 外部库主版本
 ---@param instance table 外部库实例
@@ -41,15 +42,15 @@ local function external(self, major, instance)
 
 end
 
-------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
--- 切换目标
-local switchTargets = {}
+-- 目标
+local targets = {}
 
----切换到单位目标
+-- 切换到单位目标
 ---@param unit string 单位
 ---@return boolean success 成功返回真，否则返回假
-function TargetSwitch:ToUnit(unit)
+function Library:ToUnit(unit)
 	if not unit or unit == "" then
 		return false
 	elseif not UnitExists(unit) then
@@ -84,14 +85,14 @@ function TargetSwitch:ToUnit(unit)
 	end
 
 	-- 压入切换
-	table.insert(switchTargets, 1, switch)
+	table.insert(targets, 1, switch)
 	return true
 end
 
----切换到名称目标
+-- 切换到名称目标
 ---@param name string 名称
 ---@return boolean success 成功返回真，否则返回假
-function TargetSwitch:ToName(name)
+function Library:ToName(name)
 	if not name or name == "" then
 		return false
 	end
@@ -125,19 +126,19 @@ function TargetSwitch:ToName(name)
 	end
 
 	-- 压入切换
-	table.insert(switchTargets, 1, switch)
+	table.insert(targets, 1, switch)
 	return true
 end
 
----恢复到上次目标
+-- 恢复到上次目标
 ---@return boolean success 成功返回真，否则返回假
-function TargetSwitch:ToLast()
-	if next(switchTargets) == nil then
+function Library:ToLast()
+	if next(targets) == nil then
 		return false
 	end
 
 	-- 弹出切换
-	local switch = table.remove(switchTargets, 1)
+	local switch = table.remove(targets, 1)
 	if switch.type == 2 then
 		-- 相同目标
 		local after = UnitName("target")
@@ -158,8 +159,8 @@ function TargetSwitch:ToLast()
 	return true
 end
 
-------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 -- 最终注册库
-AceLibrary:Register(TargetSwitch, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
-TargetSwitch = nil
+AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
+Library = nil
