@@ -97,4 +97,4 @@
 
 
 ## 参考天赋
-<img src="Talent.png" style="height: 70%; width: auto;" />
+<img src="Talent.png" style="height: 500px; width: auto;" />
