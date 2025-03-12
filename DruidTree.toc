@@ -5,7 +5,7 @@
 ## Author: 王胖子(xhwsd@qq.com)
 ## Version: 2.1.1
 ## Dependencies: !Libs
-## OptionalDeps: AceConsole-2.0, AceDebug-2.0, FuBarPlugin-2.0, AceLibrary, RosterLib-2.0
+## OptionalDeps: AceConsole-2.0, AceDebug-2.0, FuBarPlugin-2.0, AceLibrary, Tablet-2.0, RosterLib-2.0
 ## SavedVariablesPerCharacter: DruidTreeDB
 
 Libs\Wsd-Array-1.0\Wsd-Array-1.0.lua
@@ -18,3 +18,4 @@ Libs\Wsd-Target-1.0\Wsd-Target-1.0.lua
 Libs\Wsd-CastStatus-1.0\Wsd-CastStatus-1.0.lua 
 
 DruidTree.lua
+DruidTree.xml

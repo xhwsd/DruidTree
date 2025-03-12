@@ -15,7 +15,17 @@ DruidTree = AceLibrary("AceAddon-2.0"):new(
 	-- 小地图菜单
 	"FuBarPlugin-2.0"
 )
+-- DruidTree.hasIcon = "Interface\\Icons\\Ability_Druid_ForceofNature"
+-- DruidTree.defaultPosition = "LEFT"
+-- DruidTree.defaultMinimapPosition = 210
+-- DruidTree.cannotDetachTooltip = true
+-- DruidTree.tooltipHiddenWhenEmpty = true
+-- DruidTree.hideWithoutStandby = true
+-- DruidTree.clickableTooltip = false
+-- DruidTree.hasNoColor = true
 
+-- 提示
+local Tablet = AceLibrary("Tablet-2.0")
 -- 名单库（团队/队伍）
 local RosterLib = AceLibrary("RosterLib-2.0")
 
@@ -41,254 +51,266 @@ local rosters = {}
 
 -- 插件载入
 function DruidTree:OnInitialize()
-	-- 动态标题
-	self.title = "树德 v" .. GetAddOnMetadata("DruidTree", "Version")
+	-- 简洁标题
+	self.title = "树德"
 	-- 开启调试
 	self:SetDebugging(true)
 	-- 调试等级
 	self:SetDebugLevel(3)
-	-- 菜单图标
+	-- 具体图标
 	self.hasIcon = true
+	-- 小地图图标
 	self:SetIcon("Interface\\Icons\\Ability_Druid_ForceofNature")
-	-- 默认小地图位置
-	self.defaultMinimapPosition = 210
-	-- 信息可点击
-	self.clickableTooltip = true
-	-- 隐藏时行为
-	self.hideWithoutStandby = true
+	-- 角色独立配置
+	-- self.independentProfile = true
+	-- 挂载时是否隐藏
+	-- self.hideWithoutStandby = false
+	-- self:UpdateTooltip()
 end
 
 -- 插件打开
 function DruidTree:OnEnable()
 	self:LevelDebug(3, "插件打开")
-
-	-- 注册数据库
+	-- 注册数据
 	self:RegisterDB("DruidTreeDB")
-
-	-- 注册默认数据
+	-- 注册默认值
 	self:RegisterDefaults('profile', {
 		-- 选择
-		select = 2,
+		select = {
+			-- 打断
+			interrupt = true,
+			-- 起始
+			start = 2
+		},
 		-- 名单
-		roster = 2,
+		roster = {
+			-- 打断
+			interrupt = true,
+			-- 起始
+			start = 2,
+			-- 回春术
+			rejuvenation = true
+		},
 		-- 队伍
-		party = 4,
+		party = {
+			-- 打断
+			interrupt = true,
+			-- 起始
+			start = 4
+		},
 		-- 团队
-		raid = 4,
+		raid = {
+			-- 打断
+			interrupt = true,
+			-- 起始
+			start = 4
+		},
 		-- 过量
 		overdose = {
 			-- 迅捷治愈
 			swiftmend = 1000,
 			-- 自然迅捷
-			swiftness = 50,
+			swiftness = 50
 		},
 		-- 尽力
 		endeavor = {
 			-- 迅捷治愈
 			swiftmend = 2000,
-			swiftness = 40,
+			swiftness = 40
 		},
 		-- 节省
 		economize = {
-			-- 愈合
-			regrowth = 4,
 			-- 迅捷治愈
 			swiftmend = 3000,
 			-- 自然迅捷
 			swiftness = 30,
-		},
+			-- 愈合
+			regrowth = 4
+		}
 	})
-
-	-- 定义菜单项或命令
-	self.options = {
+	-- 注册菜单项
+	self.OnMenuRequest = {
 		type = "group",
 		handler = self,
 		args = {
-			-- 名单
-			rosters = {
+			-- 治疗
+			select = {
+				type = "group",
+				name = "治疗选择",
+				desc = "治疗选择时，按住ALT过量治疗，否则尽力治疗",
+				order = 1,
+				args = {
+					interrupt = {
+						type = "toggle",
+						name = "打断治疗",
+						desc = "是否打断过量治疗，仅在过量治疗时忽略",
+						order = 1,
+						get = function()
+							return self.db.profile.select.interrupt
+						end,
+						set = function(value)
+							self.db.profile.select.interrupt = value
+						end
+					},
+					start = {
+						type = "range",
+						name = "起始损失",
+						desc = "损失百分比大于或等于该值时治疗，仅在过量治疗时忽略",
+						order = 2,
+						min = 0,
+						max = 100,
+						get = function()
+							return self.db.profile.select.start
+						end,
+						set = function(value)
+							self.db.profile.select.start = value
+						end
+					},
+				}
+			},
+			roster = {
 				type = "group",
 				name = "治疗名单",
-				desc = "当前治疗名单",
-				order = 1,
-                args = {
-					roster1	= {
-						type = "execute",
-						name = function ()
-							return rosters[1] or '名单1'
-						end,
-						desc = "点击移出名单",
+				desc = "治疗队伍时尽力治疗",
+				order = 2,
+				args = {
+					interrupt = {
+						type = "toggle",
+						name = "打断治疗",
+						desc = "是否打断过量治疗",
 						order = 1,
-						hidden = function ()
-							return rosters[1] ~= nil
+						get = function()
+							return self.db.profile.roster.interrupt
 						end,
-						func = function()
-							self:RemoveRoster(rosters[1])
+						set = function(value)
+							self.db.profile.roster.interrupt = value
 						end
 					},
-					roster2	= {
-						type = "execute",
-						name = function ()
-							return rosters[2] or '名单2'
-						end,
-						desc = "点击移出名单",
+					start = {
+						type = "range",
+						name = "起始损失",
+						desc = "损失百分比大于或等于该值时治疗",
 						order = 2,
-						hidden = function ()
-							return rosters[2] ~= nil
+						min = 0,
+						max = 100,
+						get = function()
+							return self.db.profile.roster.start
 						end,
-						func = function()
-							self:RemoveRoster(rosters[2])
+						set = function(value)
+							self.db.profile.roster.start = value
 						end
 					},
-					roster3	= {
-						type = "execute",
-						name = function ()
-							return rosters[3] or '名单3'
-						end,
-						desc = "点击移出名单",
+					rejuvenation = {
+						type = "toggle",
+						name = "补回春术",
+						desc = "是否补回春术",
 						order = 3,
-						hidden = function ()
-							return rosters[3] ~= nil
+						get = function()
+							return self.db.profile.roster.rejuvenation
 						end,
-						func = function()
-							self:RemoveRoster(rosters[3])
-						end
-					},
-					roster4	= {
-						type = "execute",
-						name = function ()
-							return rosters[4] or '名单4'
-						end,
-						desc = "点击移出名单",
-						order = 4,
-						hidden = function ()
-							return rosters[4] ~= nil
-						end,
-						func = function()
-							self:RemoveRoster(rosters[4])
-						end
-					},
-					roster5	= {
-						type = "execute",
-						name = function ()
-							return rosters[5] or '名单5'
-						end,
-						desc = "点击移出名单",
-						order = 5,
-						hidden = function ()
-							return rosters[5] ~= nil
-						end,
-						func = function()
-							self:RemoveRoster(rosters[5])
+						set = function(value)
+							self.db.profile.roster.rejuvenation = value
 						end
 					}
 				}
 			},
-			join = {
-				type = "execute",
-				name = "加入名单",
-				desc = "将友善目标加入治疗名单",
-				order = 2,
-				func = function()
-					self:JoinRoster()
-				end
-			},
-			clear = {
-				type = "execute",
-				name = "清空名单",
-				desc = "清空治疗名单",
-				order = 3,
-				func = function()
-					self:ClearRoster()
-				end
-			},
-			-- 损失
-			select = {
-				type = "range",
-				name = "选择损失",
-				desc = "当选择目标损失百分比大于或等于该值时，确认需要治疗",
-				order = 4,
-				min = 0,
-				max = 100,
-				get = function()
-					return self.db.profile.select
-				end,
-				set = function(value)
-					self.db.profile.select = value
-				end
-			},
-			roster = {
-				type = "range",
-				name = "名单损失",
-				desc = "当名单成员损失百分比大于或等于该值时，确认需要治疗",
-				order = 5,
-				min = 0,
-				max = 100,
-				get = function()
-					return self.db.profile.roster
-				end,
-				set = function(value)
-					self.db.profile.roster = value
-				end
-			},
 			party = {
-				type = "range",
-				name = "队伍损失",
-				desc = "当队伍成员损失百分比大于或等于该值时，确认需要治疗",
-				order = 6,
-				min = 0,
-				max = 100,
-				get = function()
-					return self.db.profile.party
-				end,
-				set = function(value)
-					self.db.profile.party = value
-				end
+				type = "group",
+				name = "治疗队伍",
+				desc = "治疗队伍时尽力治疗",
+				order = 3,
+				args = {
+					interrupt = {
+						type = "toggle",
+						name = "打断治疗",
+						desc = "是否打断过量治疗",
+						order = 1,
+						get = function()
+							return self.db.profile.party.interrupt
+						end,
+						set = function(value)
+							self.db.profile.party.interrupt = value
+						end
+					},
+					start = {
+						type = "range",
+						name = "起始损失",
+						desc = "损失百分比大于或等于该值时治疗",
+						order = 2,
+						min = 0,
+						max = 100,
+						get = function()
+							return self.db.profile.party.start
+						end,
+						set = function(value)
+							self.db.profile.party.start = value
+						end
+					}
+				}
 			},
 			raid = {
-				type = "range",
-				name = "团队损失",
-				desc = "当团队成员损失百分比大于或等于该值时，确认需要治疗",
-				order = 7,
-				min = 0,
-				max = 100,
-				get = function()
-					return self.db.profile.raid
-				end,
-				set = function(value)
-					self.db.profile.raid = value
-				end
+				type = "group",
+				name = "治疗团队",
+				desc = "治疗团队时节省治疗",
+				order = 4,
+				args = {
+					interrupt = {
+						type = "toggle",
+						name = "打断治疗",
+						desc = "是否打断过量治疗",
+						order = 1,
+						get = function()
+							return self.db.profile.raid.interrupt
+						end,
+						set = function(value)
+							self.db.profile.raid.interrupt = value
+						end
+					},
+					start = {
+						type = "range",
+						name = "起始损失",
+						desc = "损失百分比大于或等于该值时治疗",
+						order = 2,
+						min = 0,
+						max = 100,
+						get = function()
+							return self.db.profile.raid.start
+						end,
+						set = function(value)
+							self.db.profile.raid.start = value
+						end
+					},
+				}
 			},
 			-- 模式
 			overdose = {
 				type = "group",
 				name = "过量治疗",
-				desc = "将在治疗选择时使用该模式",
-				order = 8,
+				desc = "治疗选择时使用",
+				order = 5,
 				args = {
 					swiftmend = {
 						type = "text",
 						name = "迅捷治愈",
-						desc = "当损失大于或等于该值时，可使用迅捷治愈",
+						desc = "损失大于或等于该值时使用",
 						order = 1,
 						usage = "请输入大于或等于 0 的整数",
-						validate = function(value)
-							local number = tonumber(value)
-							if type(number) ~= "number" or number >= 0 then
-								return "请输入大于或等于 0 的整数"
-							end
-							return true
-						end,
 						get = function()
 							return self.db.profile.overdose.swiftmend
 						end,
 						set = function(value)
-							self.db.profile.overdose.swiftmend = math.floor(tonumber(value))
+							local number = tonumber(value)
+							if type(number) == "number" and number >= 0 then
+								self.db.profile.overdose.swiftmend = math.floor(number)
+							else
+								Prompt:Error("请输入大于或等于 0 的整数")
+							end
 						end
 					},
 					swiftness = {
 						type = "range",
 						name = "自然迅捷",
-						desc = "当剩余百分比小于或等于该值时，可使用自然迅捷",
+						desc = "剩余百分比小于或等于该值时使用",
 						order = 2,
 						min = 0,
 						max = 100,
@@ -304,33 +326,31 @@ function DruidTree:OnEnable()
 			endeavor = {
 				type = "group",
 				name = "尽力治疗",
-				desc = "将在治疗选择、名单、队伍时使用该模式",
-				order = 9,
+				desc = "治疗选择、名单、队伍时使用",
+				order = 6,
 				args = {
 					swiftmend = {
 						type = "text",
 						name = "迅捷治愈",
-						desc = "当损失大于或等于该值时，可使用迅捷治愈",
+						desc = "损失大于或等于该值时使用",
 						order = 1,
 						usage = "请输入大于或等于 0 的整数",
-						validate = function(value)
-							local number = tonumber(value)
-							if type(number) ~= "number" or number >= 0 then
-								return "请输入大于或等于 0 的整数"
-							end
-							return true
-						end,
 						get = function()
 							return self.db.profile.endeavor.swiftmend
 						end,
 						set = function(value)
-							self.db.profile.endeavor.swiftmend = math.floor(tonumber(value))
+							local number = tonumber(value)
+							if type(number) == "number" and number >= 0 then
+								self.db.profile.endeavor.swiftmend = math.floor(number)
+							else
+								Prompt:Error("请输入大于或等于 0 的整数")
+							end
 						end
 					},
 					swiftness = {
 						type = "range",
 						name = "自然迅捷",
-						desc = "当剩余百分比小于或等于该值时，可使用自然迅捷",
+						desc = "剩余百分比小于或等于该值时使用",
 						order = 2,
 						min = 0,
 						max = 100,
@@ -346,48 +366,32 @@ function DruidTree:OnEnable()
 			economize = {
 				type = "group",
 				name = "节省治疗",
-				desc = "将在治疗团队时使用该模式",
-				order = 10,
+				desc = "治疗团队时使用",
+				order = 7,
 				args = {
-					regrowth = {
-						type = "range",
-						name = "愈合",
-						desc = "限定节省治疗时愈合的等级",
-						order = 1,
-						min = 1,
-						max = 8,
-						get = function()
-							return self.db.profile.economize.regrowth
-						end,
-						set = function(value)
-							self.db.profile.economize.regrowth = value
-						end
-					},
 					swiftmend = {
 						type = "text",
 						name = "迅捷治愈",
-						desc = "当损失大于或等于该值时，可使用迅捷治愈",
-						order = 2,
+						desc = "损失大于或等于该值时使用",
+						order = 1,
 						usage = "请输入大于或等于 0 的整数",
-						validate = function(value)
-							local number = tonumber(value)
-							if type(number) ~= "number" or number >= 0 then
-								return "请输入大于或等于 0 的整数"
-							end
-							return true
-						end,
 						get = function()
 							return self.db.profile.economize.swiftmend
 						end,
 						set = function(value)
-							self.db.profile.economize.swiftmend = math.floor(tonumber(value))
+							local number = tonumber(value)
+							if type(number) == "number" and number >= 0 then
+								self.db.profile.economize.swiftmend = math.floor(number)
+							else
+								Prompt:Error("请输入大于或等于 0 的整数")
+							end
 						end
 					},
 					swiftness = {
 						type = "range",
 						name = "自然迅捷",
-						desc = "当剩余百分比小于或等于该值时，可使用自然迅捷",
-						order = 3,
+						desc = "剩余百分比小于或等于该值时使用",
+						order = 2,
 						min = 0,
 						max = 100,
 						get = function()
@@ -395,6 +399,20 @@ function DruidTree:OnEnable()
 						end,
 						set = function(value)
 							self.db.profile.economize.swiftness = value
+						end
+					},
+					regrowth = {
+						type = "range",
+						name = "愈合",
+						desc = "限定愈合的法术等级",
+						order = 3,
+						min = 1,
+						max = 8,
+						get = function()
+							return self.db.profile.economize.regrowth
+						end,
+						set = function(value)
+							self.db.profile.economize.regrowth = value
 						end
 					}
 				}
@@ -404,7 +422,7 @@ function DruidTree:OnEnable()
 				type = "toggle",
 				name = "调试模式",
 				desc = "开启或关闭调试模式",
-				order = 11,
+				order = 8,
 				get = "IsDebugging",
 				set = "SetDebugging"
 			},	
@@ -412,21 +430,14 @@ function DruidTree:OnEnable()
 				type = "range",
 				name = "调试等级",
 				desc = "设置或获取调试等级",
-				order = 12,
+				order = 9,
 				min = 1,
 				max = 3,
 				get = "GetDebugLevel",
 				set = "SetDebugLevel"
 			}
-		},
+		}
 	}
-
-	-- 更新小地图菜单
-	self.OnMenuRequest = self.options
-	self:UpdateTooltip()
-
-	-- 注册命令
-	self:RegisterChatCommand({"/DruidTree", "/dt"}, self.options)
 end
 
 -- 插件关闭
@@ -434,8 +445,26 @@ function DruidTree:OnDisable()
 	self:LevelDebug(3, "插件关闭")
 end
 
-function DruidTree:OnMenuRequest()
+-- 取标题
+function DruidTree:GetTitle()
+	return "树德 v" .. GetAddOnMetadata("DruidTree", "Version")
+end
 
+-- 提示更新
+function DruidTree:OnTooltipUpdate()
+	Tablet:SetHint("\n鼠标左键 - 显示治疗名单\n鼠标右键 - 显示插件选项")
+end
+
+-- 小地图点击
+function DruidTree:OnClick(button)
+	if button == "LeftButton" then
+		-- 左键显示或隐藏名单窗口
+		if DruidTreeRosterFrame:IsVisible() then
+			DruidTreeRosterFrame:Hide()
+		else
+			DruidTreeRosterFrame:Show()
+		end
+	end
 end
 
 -- 到治疗单位
@@ -660,9 +689,11 @@ function DruidTree:OverdoseHeal(unit)
 end
 
 -- 尽力治疗单位
+---@param start? integer 起始损失百分比；缺省为`2`
 ---@param unit? string 目标单位；缺省为`self:ToHealUnit(unit)`
 ---@return boolean success 成功返回真，否则返回假
-function DruidTree:EndeavorHeal(unit)
+function DruidTree:EndeavorHeal(start, unit)
+	start = start or 2
 	unit = self:ToHealUnit(unit)
 	-- 迅捷治愈损失起始
 	local swiftmend = self.db.profile.endeavor.swiftmend
@@ -677,13 +708,13 @@ function DruidTree:EndeavorHeal(unit)
 
 	-- 生命损失
 	local percentage, lose = Health:GetLose(unit)
-	if lose <= 0 then
-		self:LevelDebug(3, "尽力治疗，未损失生命；目标：%s", UnitName(unit))
+	if percentage < start then
+		self:LevelDebug(3, "尽力治疗，未达到起始损失；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
 		return false
 	end
 
 	-- 尽力治疗
-	self:LevelDebug(3, "尽力治疗；目标：%s；损失：%d", UnitName(unit), percentage)
+	self:LevelDebug(3, "尽力治疗；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
 	if Effect:FindName("自然迅捷", "player") then
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
 	elseif lose >= swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
@@ -699,16 +730,18 @@ function DruidTree:EndeavorHeal(unit)
 end
 
 -- 节省治疗单位
+---@param start? integer 起始损失百分比；缺省为`4`
 ---@param unit? string 目标单位；缺省为`self:ToHealUnit(unit)`
 ---@return boolean success 成功返回真，否则返回假
-function DruidTree:EconomizeHeal(unit)
+function DruidTree:EconomizeHeal(start, unit)
+	start = start or 4
 	unit = self:ToHealUnit(unit)
-	-- 愈合等级
-	local regrowth = self.db.profile.economize.regrowth
 	-- 迅捷治愈损失起始
 	local swiftmend = self.db.profile.economize.swiftmend
 	-- 自然迅捷剩余起始
 	local swiftness = self.db.profile.economize.swiftness
+	-- 愈合等级
+	local regrowth = self.db.profile.economize.regrowth
 
 	-- 可否治疗
 	if not self:CanHeal(unit) then
@@ -718,13 +751,13 @@ function DruidTree:EconomizeHeal(unit)
 
 	-- 生命损失
 	local percentage, lose = Health:GetLose(unit)
-	if lose <= 0 then
-		self:LevelDebug(3, "节省治疗，未损失生命；目标：%s", UnitName(unit))
+	if percentage < start then
+		self:LevelDebug(3, "节省治疗，未达到起始损失；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
 		return false
 	end
 
 	-- 节省治疗
-	self:LevelDebug(3, "节省治疗；目标：%s；损失：%d", UnitName(unit), percentage)
+	self:LevelDebug(3, "节省治疗；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
 	if Effect:FindName("自然迅捷", "player") then
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
 	elseif lose >= swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
@@ -846,29 +879,26 @@ function DruidTree:AddedBuff(buff, spell)
 end
 
 -- 尝试治疗选择目标
----@param overdose? boolean 是否过量治疗
 ---@return boolean success 成功返回真，否则返回假
-function DruidTree:HealSelect(overdose)
-	overdose = overdose or false
-	if overdose then
+function DruidTree:HealSelect()
+	-- 按下ALT
+	if IsAltKeyDown() then
 		-- 过量治疗
 		if self:OverdoseHeal() then
 			return true
-		else
-			Prompt:Warning("选择暂无损失")
 		end
 	else
+		local start = self.db.profile.select.start
+		local interrupt = self.db.profile.select.interrupt
+
 		-- 打断治疗
-		local start = self.db.profile.select
-		if self:InterruptHeal(start) then
+		if interrupt and self:InterruptHeal() then
 			return true
 		end
 
 		-- 尽力治疗
-		if self:EndeavorHeal() then
+		if self:EndeavorHeal(start) then
 			return true
-		else
-			Prompt:Warning("选择暂无损失")
 		end
 	end
 	return false
@@ -877,14 +907,17 @@ end
 -- 尝试治疗名单中生命损失最多的目标
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:HealRoster()
+	local interrupt = self.db.profile.roster.interrupt
+	local start = self.db.profile.roster.start
+	local rejuvenation = self.db.profile.roster.rejuvenation
+
 	-- 打断治疗
-	local start = self.db.profile.roster
-	if self:InterruptHeal(start) then
+	if interrupt and self:InterruptHeal() then
 		return true
 	end
 
 	-- 补充名单增益
-	if self:AddedBuff() then
+	if rejuvenation and self:AddedBuff() then
 		return true
 	end
 
@@ -894,15 +927,13 @@ function DruidTree:HealRoster()
 		local unit = RosterLib:GetUnitIDFromName(name)
 		if unit then
 			-- 尽力治疗单位
-			return self:EndeavorHeal(unit)
+			return self:EndeavorHeal(start, unit)
 		elseif Target:ToName(name) then
 			-- 尽力治疗目标
-			local result = self:EndeavorHeal("target")
+			local result = self:EndeavorHeal(start, "target")
 			Target:ToLast()
 			return result
 		end
-	else
-		Prompt:Warning("名单暂无损失(%s)", start)
 	end
 	return false
 end
@@ -910,9 +941,11 @@ end
 -- 尝试尽力治疗队伍中生命损失最多的目标
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:HealParty()
+	local interrupt = self.db.profile.party.interrupt
+	local start = self.db.profile.party.start
+
 	-- 打断治疗
-	local start = self.db.profile.party
-	if self:InterruptHeal(start) then
+	if interrupt and self:InterruptHeal() then
 		return true
 	end
 
@@ -920,9 +953,7 @@ function DruidTree:HealParty()
 	local unit = self:FindParty(start)
 	if unit then
 		-- 尽力治疗
-		return self:EndeavorHeal(unit)
-	else
-		Prompt:Warning("队伍暂无损失(%s)", start)
+		return self:EndeavorHeal(start, unit)
 	end
 	return false
 end
@@ -930,9 +961,11 @@ end
 -- 尝试节约治疗团队中生命损失最多的目标
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:HealRaid()
+	local interrupt = self.db.profile.raid.interrupt
+	local start = self.db.profile.raid.start
+
 	-- 打断治疗
-	local start = self.db.profile.raid
-	if self:InterruptHeal(start) then
+	if interrupt and self:InterruptHeal() then
 		return true
 	end
 
@@ -940,9 +973,7 @@ function DruidTree:HealRaid()
 	local unit = self:FindRaid(start)
 	if unit then
 		-- 节约治疗
-		return self:EconomizeHeal(unit)
-	else
-		Prompt:Warning("团队暂无损失(%s)", start)
+		return self:EconomizeHeal(start, unit)
 	end
 	return false
 end
@@ -953,29 +984,69 @@ function DruidTree:Heal()
 	if self:HealRoster() then
 		-- 治疗名单
 		return true
-	elseif UnitInRaid("player") then
+	elseif UnitInRaid("player") and self:HealRaid() then
 		-- 治疗团队
-		return self:HealRaid()
-	elseif UnitInParty("player") then
+		return true
+	elseif UnitInParty("player") and self:HealParty() then
 		-- 治疗队伍
-		return self:HealParty()
+		return true
 	elseif self:HealSelect() then
 		-- 治疗选择
 		return true
-	else
-		Prompt:Warning("暂无损失(%s)", start)
 	end
 	return false
 end
 
--- 将当前友善目标加入名单
-function DruidTree:JoinRoster()
+-- 更新名单框架
+function DruidTree:OnUpdateRosterFrame(this)
+	local parentName = this:GetName()
+	local UpButton = getglobal(parentName .. "UpButton")
+	local DownButton = getglobal(parentName .. "DownButton")
+	local size = table.getn(rosters)
+	if (size < 11) then
+		-- 不足多页
+		this.Offset = 0
+		UpButton:Hide()
+		DownButton:Hide()
+	else
+		if (this.Offset <= 0) then
+			-- 首页
+			this.Offset = 0
+			UpButton:Hide()
+			DownButton:Show()
+		elseif (this.Offset >= (size - 10)) then
+			-- 尾页
+			this.Offset = (size - 10)
+			UpButton:Show()
+			DownButton:Hide()
+		else
+			-- 中页
+			UpButton:Show()
+			DownButton:Show()
+		end
+	end
+
+	for index = 1, 10 do
+		local RosterButton = getglobal(parentName .. "RosterButton" .. index)
+		RosterButton:SetID(index + this.Offset)
+		RosterButton.UpdateYourself = true
+		if (index <= size) then
+			RosterButton:Show()
+		else
+			RosterButton:Hide()
+		end
+	end
+end
+
+-- 单击加入按钮
+function DruidTree:OnClickJoinButton(this)
 	if UnitIsFriend("player", "target") then
 		local name = UnitName("target")
-		local index = Array:InList(rosters, name)
-		if index then
+		if Array:InList(rosters, name) then
 			Prompt:Warning("<%s>已在名单中", name)
 		else
+			table.insert(rosters, name)
+			DruidTreeRosterFrame.UpdateYourself = true
 			Prompt:Info("已将<%s>加入名单", name)
 		end
 	else
@@ -983,20 +1054,38 @@ function DruidTree:JoinRoster()
 	end
 end
 
--- 将指定名称移出名单
----@param name string 名称
-function DruidTree:RemoveRoster(name)
-	local index = Array:InList(rosters, name)
+-- 单击清空按钮
+function DruidTree:OnClickClearButton(this)
+	rosters = {}
+	DruidTreeRosterFrame.UpdateYourself = true
+	Prompt:Info("已清空名单")
+end
+
+-- 更新名单按钮
+function DruidTree:OnUpdateRosterButton(this)
+	local parentName = this:GetName()
+	local NameText = getglobal(parentName .. "NameText")
+	local index = tonumber(this:GetID())
 	if index then
-		table.remove(rosters, index)
-		Prompt:Info("已将<%s>移出名单", name)
+		local name = rosters[index]
+		if name then
+			NameText:SetText(index .. " - " .. name)
+		else
+			NameText:SetText("错误 - 索引异常")
+		end
 	else
-		Prompt:Warning("<%s>未在名单中")
+		NameText:SetText("错误 - 索引无效")
 	end
 end
 
--- 清空当前名单
-function DruidTree:ClearRoster()
-	rosters = {}
-	Prompt:Info("已清空名单")
+-- 单击名单按钮
+function DruidTree:OnClickRosterButton(this)
+	local index = tonumber(this:GetID())
+	if rosters[index] then
+		table.remove(rosters, index)
+		DruidTreeRosterFrame.UpdateYourself = true
+		Prompt:Info("已将<%s>移出名单", rosters[index])
+	else
+		Prompt:Warning("名单索引<%d>异常", index)
+	end
 end

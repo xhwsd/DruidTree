@@ -1,0 +1,299 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+	<!-- 名单模板 -->
+    <Button name="DruidTreeRosterButton" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="150" y="16" />
+		</Size>
+		<NormalText name="$parentNameText" inherits="GameFontNormalSmall" justifyH="LEFT" text="Assistant">
+			<Size>
+				<AbsDimension x="150" y="16" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" />
+			</Anchors>
+		</NormalText>
+		<Scripts>
+			<OnLoad>
+				<!--
+				this.Priority = true;
+				this:RegisterForClicks('LeftButtonDown', 'RightButtonDown', 'MiddleButtonDown', 'Button4Down', 'Button5Down');
+				-->
+			</OnLoad>
+			<OnShow>
+				this.UpdateYourself = true
+			</OnShow>
+			<OnUpdate>
+				if this.UpdateYourself then
+					this.UpdateYourself = false
+					DruidTree:OnUpdateRosterButton(this)
+				end
+			</OnUpdate>
+			<OnEnter>
+			    DruidTreeTooltip:SetOwner(this, "ANCHOR_TOPRIGHT")
+				DruidTreeTooltip:ClearLines()
+				DruidTreeTooltip:SetText("将该名称移出名单")
+				DruidTreeTooltip:Show()
+			</OnEnter>
+			<OnLeave>
+				DruidTreeTooltip:Hide()
+			</OnLeave>
+			<OnClick>
+				DruidTree:OnClickRosterButton(this)
+			</OnClick>
+		</Scripts>
+    </Button>
+	
+	<!-- 角色框架 -->
+	<Frame name="DruidTreeRosterFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="150" y="230" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<TitleRegion setAllPoints="true" />
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16" />
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5" />
+			</BackgroundInsets>
+		</Backdrop>
+		<Scripts>
+            <OnLoad>
+                this.Offset = 0
+            </OnLoad>
+            <OnShow>
+                this.UpdateYourself = true
+            </OnShow>
+            <OnUpdate>
+				if this.UpdateYourself then
+					this.UpdateYourself = false
+					DruidTree:OnUpdateRosterFrame(this)
+				end
+            </OnUpdate>
+			<OnEnter>
+			    DruidTreeTooltip:SetOwner(this, "ANCHOR_TOPRIGHT")
+				DruidTreeTooltip:ClearLines()
+				DruidTreeTooltip:SetText("树德治疗名单")
+				DruidTreeTooltip:Show()
+			</OnEnter>
+			<OnLeave>
+				DruidTreeTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+		<Layers>
+			<Layer level="BACKGROUND">
+			<FontString name="$parentText" inherits="GameFontNormal" text="治疗名单">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="0" y="-5" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-- 清空按钮 -->
+			<Button name="$parentClearButton" inherits="GameMenuButtonTemplate" text="清空">
+				<Size>
+					<AbsDimension x="40" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="0" y="-20" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						DruidTreeTooltip:SetOwner(this, "ANCHOR_TOPRIGHT")
+						DruidTreeTooltip:ClearLines()
+						DruidTreeTooltip:SetText("清空所有名称")
+						DruidTreeTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						DruidTreeTooltip:Hide()
+					</OnLeave>
+                    <OnClick>
+						DruidTree:OnClickClearButton(this)
+                    </OnClick>
+				</Scripts>
+			</Button>
+
+			<!-- 关闭按钮 -->
+			<Button name="$parentCloseButton" inherits="GameMenuButtonTemplate" text="关闭">
+				<Size>
+					<AbsDimension x="40" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentClearButton"/>
+				</Anchors>
+				<Scripts>
+				    <OnClick>
+						this:GetParent():Hide()
+					</OnClick>
+					<OnEnter>
+						DruidTreeTooltip:SetOwner(this, "ANCHOR_TOPRIGHT")
+						DruidTreeTooltip:ClearLines()
+						DruidTreeTooltip:SetText("关闭名单窗口")
+						DruidTreeTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						DruidTreeTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<!-- 加入按钮 -->
+			<Button name="$parentJoinButton" inherits="GameMenuButtonTemplate" text="加入">
+				<Size>
+					<AbsDimension x="40" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parentClearButton"/>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						DruidTreeTooltip:SetOwner(this, "ANCHOR_TOPRIGHT")
+						DruidTreeTooltip:ClearLines()
+						DruidTreeTooltip:SetText("将友善目标加入名单")
+						DruidTreeTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						DruidTreeTooltip:Hide()
+					</OnLeave>
+	                <OnClick>
+                        DruidTree:OnClickJoinButton(this)
+                    </OnClick>
+				</Scripts>
+			</Button>
+
+			<!-- 上页按钮 -->
+            <Button name="$parentUpButton" inherits="GameMenuButtonTemplate" text="上页">
+                <Size>
+                    <AbsDimension x="40" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent">
+                        <Offset>
+                            <AbsDimension x="5" y="5"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+					<OnEnter>
+						DruidTreeTooltip:SetOwner(this, "ANCHOR_TOPRIGHT")
+						DruidTreeTooltip:ClearLines()
+						DruidTreeTooltip:SetText("切换到上一页")
+						DruidTreeTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						DruidTreeTooltip:Hide()
+					</OnLeave>
+                    <OnClick>
+                        this:GetParent().Offset = this:GetParent().Offset - 1
+                        this:GetParent().UpdateYourself = true
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+			<!-- 下页按钮 -->
+            <Button name="$parentDownButton" inherits="GameMenuButtonTemplate" text="下页">
+                <Size>
+                    <AbsDimension x="40" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent">
+                        <Offset>
+                            <AbsDimension x="-5" y="5"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+					<OnEnter>
+						DruidTreeTooltip:SetOwner(this, "ANCHOR_TOPRIGHT")
+						DruidTreeTooltip:ClearLines()
+						DruidTreeTooltip:SetText("切换到下一页")
+						DruidTreeTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						DruidTreeTooltip:Hide()
+					</OnLeave>
+                    <OnClick>
+                        this:GetParent().Offset = this:GetParent().Offset + 1
+                        this:GetParent().UpdateYourself = true
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+			<!-- 名单按钮 -->
+			<Button name="$parentRosterButton1" id="1" inherits="DruidTreeRosterButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="5" y="-40" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentRosterButton2" id="2" inherits="DruidTreeRosterButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRosterButton1" />
+				</Anchors>
+			</Button>
+			<Button name="$parentRosterButton3" id="3" inherits="DruidTreeRosterButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRosterButton2" />
+				</Anchors>
+			</Button>
+			<Button name="$parentRosterButton4" id="4" inherits="DruidTreeRosterButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRosterButton3" />
+				</Anchors>
+			</Button>
+			<Button name="$parentRosterButton5" id="5" inherits="DruidTreeRosterButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRosterButton4" />
+				</Anchors>
+			</Button>
+			<Button name="$parentRosterButton6" id="6" inherits="DruidTreeRosterButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRosterButton5" />
+				</Anchors>
+			</Button>
+			<Button name="$parentRosterButton7" id="7" inherits="DruidTreeRosterButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRosterButton6" />
+				</Anchors>
+			</Button>
+			<Button name="$parentRosterButton8" id="8" inherits="DruidTreeRosterButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRosterButton7" />
+				</Anchors>
+			</Button>
+			<Button name="$parentRosterButton9" id="9" inherits="DruidTreeRosterButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRosterButton8" />
+				</Anchors>
+			</Button>
+			<Button name="$parentRosterButton10" id="10" inherits="DruidTreeRosterButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRosterButton9" />
+				</Anchors>
+			</Button>
+		</Frames>
+	</Frame>
+
+    <GameTooltip name="DruidTreeTooltip" hidden="true" inherits="GameTooltipTemplate" parent="DruidTreeRosterFrame" />
+</Ui>
