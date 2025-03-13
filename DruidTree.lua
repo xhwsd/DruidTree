@@ -124,9 +124,9 @@ function DruidTree:OnInitialize()
 	-- 小地图图标
 	self:SetIcon("Interface\\Icons\\Ability_Druid_ForceofNature")
 	-- 角色独立配置
-	-- self.independentProfile = true
+	self.independentProfile = true
 	-- 挂载时是否隐藏
-	-- self.hideWithoutStandby = false
+	self.hideWithoutStandby = false
 	-- self:UpdateTooltip()
 end
 
@@ -149,7 +149,7 @@ function DruidTree:OnEnable()
 					interrupt = {
 						type = "toggle",
 						name = "打断治疗",
-						desc = "是否打断过量治疗，仅在过量治疗时忽略",
+						desc = "是否打断过量治疗，过量治疗时忽略",
 						order = 1,
 						get = function()
 							return self.db.profile.select.interrupt
@@ -161,7 +161,7 @@ function DruidTree:OnEnable()
 					start = {
 						type = "range",
 						name = "起始损失",
-						desc = "损失百分比大于或等于该值时治疗，仅在过量治疗时忽略",
+						desc = "损失大于或等于该百分比时治疗，过量治疗时忽略",
 						order = 2,
 						min = 0,
 						max = 100,
@@ -195,7 +195,7 @@ function DruidTree:OnEnable()
 					start = {
 						type = "range",
 						name = "起始损失",
-						desc = "损失百分比大于或等于该值时治疗",
+						desc = "损失大于或等于该百分比时治疗",
 						order = 2,
 						min = 0,
 						max = 100,
@@ -241,7 +241,7 @@ function DruidTree:OnEnable()
 					start = {
 						type = "range",
 						name = "起始损失",
-						desc = "损失百分比大于或等于该值时治疗",
+						desc = "损失大于或等于该百分比时治疗",
 						order = 2,
 						min = 0,
 						max = 100,
@@ -275,7 +275,7 @@ function DruidTree:OnEnable()
 					start = {
 						type = "range",
 						name = "起始损失",
-						desc = "损失百分比大于或等于该值时治疗",
+						desc = "损失大于或等于该百分比时治疗",
 						order = 2,
 						min = 0,
 						max = 100,
@@ -316,7 +316,7 @@ function DruidTree:OnEnable()
 					swiftness = {
 						type = "range",
 						name = "自然迅捷",
-						desc = "剩余百分比小于或等于该值时使用",
+						desc = "剩余小于或等于该百分比时使用",
 						order = 2,
 						min = 0,
 						max = 100,
@@ -356,7 +356,7 @@ function DruidTree:OnEnable()
 					swiftness = {
 						type = "range",
 						name = "自然迅捷",
-						desc = "剩余百分比小于或等于该值时使用",
+						desc = "剩余小于或等于该百分比时使用",
 						order = 2,
 						min = 0,
 						max = 100,
@@ -396,7 +396,7 @@ function DruidTree:OnEnable()
 					swiftness = {
 						type = "range",
 						name = "自然迅捷",
-						desc = "剩余百分比小于或等于该值时使用",
+						desc = "剩余小于或等于该百分比时使用",
 						order = 2,
 						min = 0,
 						max = 100,
@@ -445,7 +445,7 @@ function DruidTree:OnEnable()
 		}
 	}
 
-	-- 初始显示窗口
+	-- 恢复窗口显示
 	if self.db.profile.show then
 		DruidTreeRosterFrame:Show()
 	end
@@ -570,7 +570,7 @@ function DruidTree:CastSpell(spell, unit)
 end
 
 -- 打断治疗
----@param start? integer 起始生命损失百分比；缺省为`0`
+---@param start? integer 起始损失百分比；缺省为`0`
 ---@return boolean stop 已打断返回真，未打断返回假
 function DruidTree:InterruptHeal(start)
 	start = start or 0
@@ -597,7 +597,7 @@ function DruidTree:InterruptHeal(start)
 				end
 			end
 			
-			-- 检验生命损失
+			-- 检验损失
 			if lose <= start then
 				self:LevelDebug(3, "打断治疗；法术：%s；目标：%s；起始：%d；损失：%d", spell, target, start, lose)
 				-- 打断施放
@@ -772,7 +772,7 @@ function DruidTree:EconomizeHeal(start, unit)
 end
 
 -- 查找名单中损失最多名称
----@param start? integer 起始生命损失百分比；缺省为`2`
+---@param start? integer 起始损失百分比；缺省为`2`
 ---@return string target 已找到返回单位，未找到否则返回空
 function DruidTree:FindRoster(start)
 	start = start or 2
@@ -829,7 +829,7 @@ function DruidTree:FindParty(start)
 end
 
 -- 查找团队中损失最多单位
----@param start? integer 起始生命损失百分比；缺省为`6`
+---@param start? integer 起始损失百分比；缺省为`6`
 ---@return string target 已找到返回单位，未找到否则返回空
 function DruidTree:FindRaid(start)
 	start = start or 6
@@ -902,7 +902,7 @@ function DruidTree:HealSelect()
 	return false
 end
 
--- 尝试治疗名单中生命损失最多的目标
+-- 尝试治疗名单中损失最多的目标
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:HealRoster()
 	-- 打断治疗
@@ -933,7 +933,7 @@ function DruidTree:HealRoster()
 	return false
 end
 
--- 尝试尽力治疗队伍中生命损失最多的目标
+-- 尝试尽力治疗队伍中损失最多的目标
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:HealParty()
 	-- 打断治疗
@@ -951,7 +951,7 @@ function DruidTree:HealParty()
 	return false
 end
 
--- 尝试节约治疗团队中生命损失最多的目标
+-- 尝试节约治疗团队中损失最多的目标
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:HealRaid()
 	-- 打断治疗
@@ -969,7 +969,7 @@ function DruidTree:HealRaid()
 	return false
 end
 
--- 尝试治疗名单、团队、队伍、选择中生命损失最多的目标
+-- 尝试治疗名单、团队、队伍、选择中损失最多的目标
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:Heal()
 	if self:HealRoster() then
@@ -1050,6 +1050,13 @@ function DruidTree:OnClickClearButton(this)
 	self.db.profile.rosters = {}
 	DruidTreeRosterFrame.UpdateYourself = true
 	Prompt:Info("已清空名单")
+end
+
+-- 单击关闭按钮
+function DruidTree:OnClickCloseButton(this)
+	-- 隐藏名单框架
+	this:GetParent():Hide()
+	self.db.profile.show = false
 end
 
 -- 更新名单按钮

@@ -141,7 +141,7 @@
 				</Anchors>
 				<Scripts>
 				    <OnClick>
-						this:GetParent():Hide()
+						DruidTree:OnClickCloseButton(this)
 					</OnClick>
 					<OnEnter>
 						DruidTreeTooltip:SetOwner(this, "ANCHOR_TOPRIGHT")
