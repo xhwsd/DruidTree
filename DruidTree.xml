@@ -69,7 +69,7 @@
 		<Scripts>
             <OnLoad>
                 this.Offset = 0
-				DruidTree:OnLoadRosterFrame(this)
+				<!-- DruidTree:OnLoadRosterFrame(this) -->
             </OnLoad>
             <OnShow>
                 this.UpdateYourself = true

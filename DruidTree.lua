@@ -54,20 +54,7 @@ function DruidTree:OnInitialize()
 	self:SetDebugging(true)
 	-- 调试等级
 	self:SetDebugLevel(2)
-	-- 具体图标
-	self.hasIcon = true
-	-- 小地图图标
-	self:SetIcon("Interface\\Icons\\Ability_Druid_ForceofNature")
-	-- 角色独立配置
-	-- self.independentProfile = true
-	-- 挂载时是否隐藏
-	-- self.hideWithoutStandby = false
-	-- self:UpdateTooltip()
-end
-
--- 插件打开
-function DruidTree:OnEnable()
-	self:LevelDebug(3, "插件打开")
+	
 	-- 注册数据
 	self:RegisterDB("DruidTreeDB")
 	-- 注册默认值
@@ -131,6 +118,21 @@ function DruidTree:OnEnable()
 		-- 名单列表
 		rosters = {},
 	})
+
+	-- 具体图标
+	self.hasIcon = true
+	-- 小地图图标
+	self:SetIcon("Interface\\Icons\\Ability_Druid_ForceofNature")
+	-- 角色独立配置
+	-- self.independentProfile = true
+	-- 挂载时是否隐藏
+	-- self.hideWithoutStandby = false
+	-- self:UpdateTooltip()
+end
+
+-- 插件打开
+function DruidTree:OnEnable()
+	self:LevelDebug(3, "插件打开")
 	-- 注册菜单项
 	self.OnMenuRequest = {
 		type = "group",
@@ -982,7 +984,7 @@ end
 
 -- 载入名单框架
 function DruidTree:OnLoadRosterFrame(this)
-	-- 初始显示仓库
+	-- 初始显示窗口
 	-- if self.db.profile.show then
 	-- 	DruidTreeRosterFrame:Show()
 	-- end
