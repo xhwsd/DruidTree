@@ -46,7 +46,7 @@
 		</Scripts>
     </Button>
 	
-	<!-- 角色框架 -->
+	<!-- 名单框架 -->
 	<Frame name="DruidTreeRosterFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" hidden="true" parent="UIParent">
 		<Size>
 			<AbsDimension x="150" y="230" />
@@ -69,10 +69,14 @@
 		<Scripts>
             <OnLoad>
                 this.Offset = 0
+				DruidTree:OnLoadRosterFrame(this)
             </OnLoad>
             <OnShow>
                 this.UpdateYourself = true
             </OnShow>
+			<OnHide>
+				
+			</OnHide>
             <OnUpdate>
 				if this.UpdateYourself then
 					this.UpdateYourself = false

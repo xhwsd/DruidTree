@@ -46,9 +46,6 @@ local Target = AceLibrary("Wsd-Target-1.0")
 ---@type Wsd-CastStatus-1.0
 local CastStatus = AceLibrary("Wsd-CastStatus-1.0")
 
--- 名单
-local rosters = {}
-
 -- 插件载入
 function DruidTree:OnInitialize()
 	-- 简洁标题
@@ -75,14 +72,14 @@ function DruidTree:OnEnable()
 	self:RegisterDB("DruidTreeDB")
 	-- 注册默认值
 	self:RegisterDefaults('profile', {
-		-- 选择
+		-- 治疗选择
 		select = {
 			-- 打断
 			interrupt = true,
 			-- 起始
 			start = 2
 		},
-		-- 名单
+		-- 治疗名单
 		roster = {
 			-- 打断
 			interrupt = true,
@@ -91,34 +88,35 @@ function DruidTree:OnEnable()
 			-- 回春术
 			rejuvenation = true
 		},
-		-- 队伍
+		-- 治疗队伍
 		party = {
 			-- 打断
 			interrupt = true,
 			-- 起始
 			start = 4
 		},
-		-- 团队
+		-- 治疗团队
 		raid = {
 			-- 打断
 			interrupt = true,
 			-- 起始
 			start = 4
 		},
-		-- 过量
+
+		-- 过量治疗
 		overdose = {
 			-- 迅捷治愈
 			swiftmend = 1000,
 			-- 自然迅捷
 			swiftness = 50
 		},
-		-- 尽力
+		-- 尽力治疗
 		endeavor = {
 			-- 迅捷治愈
 			swiftmend = 2000,
 			swiftness = 40
 		},
-		-- 节省
+		-- 节省治疗
 		economize = {
 			-- 迅捷治愈
 			swiftmend = 3000,
@@ -126,7 +124,12 @@ function DruidTree:OnEnable()
 			swiftness = 30,
 			-- 愈合
 			regrowth = 4
-		}
+		},
+
+		-- 显示窗口
+		show = true,
+		-- 名单列表
+		rosters = {},
 	})
 	-- 注册菜单项
 	self.OnMenuRequest = {
@@ -447,11 +450,13 @@ end
 
 -- 取标题
 function DruidTree:GetTitle()
+	-- 置小地图图标点燃标题
 	return "树德 v" .. GetAddOnMetadata("DruidTree", "Version")
 end
 
 -- 提示更新
 function DruidTree:OnTooltipUpdate()
+	-- 置小地图图标点燃提示
 	Tablet:SetHint("\n鼠标左键 - 显示治疗名单\n鼠标右键 - 显示插件选项")
 end
 
@@ -461,8 +466,10 @@ function DruidTree:OnClick(button)
 		-- 左键显示或隐藏名单窗口
 		if DruidTreeRosterFrame:IsVisible() then
 			DruidTreeRosterFrame:Hide()
+			self.db.profile.show = false
 		else
 			DruidTreeRosterFrame:Show()
+			self.db.profile.show = true
 		end
 	end
 end
@@ -660,11 +667,7 @@ end
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:OverdoseHeal(unit)
 	unit = self:ToHealUnit(unit)
-	-- 迅捷治愈损失起始
-	local swiftmend = self.db.profile.overdose.swiftmend
-	-- 自然迅捷剩余起始
-	local swiftness = self.db.profile.overdose.swiftness
-	
+
 	-- 可否治疗
 	if not self:CanHeal(unit) then
 		self:LevelDebug(3, "过量治疗，不可治疗；目标：%s", UnitName(unit))
@@ -676,9 +679,9 @@ function DruidTree:OverdoseHeal(unit)
 	self:LevelDebug(3, "过量治疗；目标：%s；损失：%d", UnitName(unit), percentage)
 	if Effect:FindName("自然迅捷") then
 		self:CastSpell("愈合", unit)
-	elseif lose >= swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
+	elseif lose >= self.db.profile.overdose.swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
 		self:CastSpell("迅捷治愈", unit)
-	elseif Health:GetRemaining(unit) <= swiftness and Spell:IsReady("自然迅捷") then
+	elseif Health:GetRemaining(unit) <= self.db.profile.overdose.swiftness and Spell:IsReady("自然迅捷") then
 		self:CastSpell("自然迅捷")
 	elseif not Effect:FindName("回春术", unit) then
 		self:CastSpell("回春术", unit)
@@ -695,11 +698,7 @@ end
 function DruidTree:EndeavorHeal(start, unit)
 	start = start or 2
 	unit = self:ToHealUnit(unit)
-	-- 迅捷治愈损失起始
-	local swiftmend = self.db.profile.endeavor.swiftmend
-	-- 自然迅捷剩余起始
-	local swiftness = self.db.profile.endeavor.swiftness
-	
+
 	-- 可否治疗
 	if not self:CanHeal(unit) then
 		self:LevelDebug(3, "尽力治疗，不可治疗；目标：%s", UnitName(unit))
@@ -717,9 +716,9 @@ function DruidTree:EndeavorHeal(start, unit)
 	self:LevelDebug(3, "尽力治疗；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
 	if Effect:FindName("自然迅捷", "player") then
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
-	elseif lose >= swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
+	elseif lose >= self.db.profile.endeavor.swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
 		self:CastSpell("迅捷治愈", unit)
-	elseif Health:GetRemaining(unit) <= swiftness and Spell:IsReady("自然迅捷") then
+	elseif Health:GetRemaining(unit) <= self.db.profile.endeavor.swiftness and Spell:IsReady("自然迅捷") then
 		self:CastSpell("自然迅捷")
 	elseif not Effect:FindName("回春术", unit) then
 		self:CastSpell(self:AdaptRank("回春术", lose, unit), unit)
@@ -736,12 +735,6 @@ end
 function DruidTree:EconomizeHeal(start, unit)
 	start = start or 4
 	unit = self:ToHealUnit(unit)
-	-- 迅捷治愈损失起始
-	local swiftmend = self.db.profile.economize.swiftmend
-	-- 自然迅捷剩余起始
-	local swiftness = self.db.profile.economize.swiftness
-	-- 愈合等级
-	local regrowth = self.db.profile.economize.regrowth
 
 	-- 可否治疗
 	if not self:CanHeal(unit) then
@@ -760,12 +753,12 @@ function DruidTree:EconomizeHeal(start, unit)
 	self:LevelDebug(3, "节省治疗；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
 	if Effect:FindName("自然迅捷", "player") then
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
-	elseif lose >= swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
+	elseif lose >= self.db.profile.economize.swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
 		self:CastSpell("迅捷治愈", unit)
-	elseif Health:GetRemaining(unit) <= swiftness and Spell:IsReady("自然迅捷") then
+	elseif Health:GetRemaining(unit) <= self.db.profile.economize.swiftness and Spell:IsReady("自然迅捷") then
 		self:CastSpell("自然迅捷")
 	else
-		self:CastSpell(string.format("愈合(等级 %d)", regrowth), unit) 
+		self:CastSpell(string.format("愈合(等级 %d)", self.db.profile.economize.regrowth), unit) 
 	end
 	return true
 end
@@ -778,7 +771,7 @@ function DruidTree:FindRoster(start)
 
 	-- 名单查找
 	local max, target = 0
-	for _, name in ipairs(rosters) do
+	for _, name in ipairs(self.db.profile.rosters) do
 		local unit = RosterLib:GetUnitIDFromName(name)
 		if unit then
 			-- 单位匹配
@@ -855,7 +848,7 @@ function DruidTree:AddedBuff(buff, spell)
 	spell = spell or buff
 
 	-- 名单查找
-	for _, name in ipairs(rosters) do
+	for _, name in ipairs(self.db.profile.rosters) do
 		local unit = RosterLib:GetUnitIDFromName(name)
 		if unit then
 			if not Effect:FindName(buff, unit) and self:CanHeal(unit) then
@@ -888,16 +881,13 @@ function DruidTree:HealSelect()
 			return true
 		end
 	else
-		local start = self.db.profile.select.start
-		local interrupt = self.db.profile.select.interrupt
-
 		-- 打断治疗
-		if interrupt and self:InterruptHeal() then
+		if self.db.profile.select.interrupt and self:InterruptHeal() then
 			return true
 		end
 
 		-- 尽力治疗
-		if self:EndeavorHeal(start) then
+		if self:EndeavorHeal(self.db.profile.select.start) then
 			return true
 		end
 	end
@@ -907,21 +897,18 @@ end
 -- 尝试治疗名单中生命损失最多的目标
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:HealRoster()
-	local interrupt = self.db.profile.roster.interrupt
-	local start = self.db.profile.roster.start
-	local rejuvenation = self.db.profile.roster.rejuvenation
-
 	-- 打断治疗
-	if interrupt and self:InterruptHeal() then
+	if self.db.profile.roster.interrupt and self:InterruptHeal() then
 		return true
 	end
 
 	-- 补充名单增益
-	if rejuvenation and self:AddedBuff() then
+	if self.db.profile.roster.rejuvenation and self:AddedBuff() then
 		return true
 	end
 
 	-- 查找名单损失
+	local start = self.db.profile.roster.start
 	local name = self:FindRoster(start)
 	if name then
 		local unit = RosterLib:GetUnitIDFromName(name)
@@ -941,15 +928,13 @@ end
 -- 尝试尽力治疗队伍中生命损失最多的目标
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:HealParty()
-	local interrupt = self.db.profile.party.interrupt
-	local start = self.db.profile.party.start
-
 	-- 打断治疗
-	if interrupt and self:InterruptHeal() then
+	if self.db.profile.party.interrupt and self:InterruptHeal() then
 		return true
 	end
 
 	-- 查找队伍损失
+	local start = self.db.profile.party.start
 	local unit = self:FindParty(start)
 	if unit then
 		-- 尽力治疗
@@ -961,15 +946,13 @@ end
 -- 尝试节约治疗团队中生命损失最多的目标
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:HealRaid()
-	local interrupt = self.db.profile.raid.interrupt
-	local start = self.db.profile.raid.start
-
 	-- 打断治疗
-	if interrupt and self:InterruptHeal() then
+	if self.db.profile.raid.interrupt and self:InterruptHeal() then
 		return true
 	end
 
 	-- 查找团队损失
+	local start = self.db.profile.raid.start
 	local unit = self:FindRaid(start)
 	if unit then
 		-- 节约治疗
@@ -997,12 +980,20 @@ function DruidTree:Heal()
 	return false
 end
 
+-- 载入名单框架
+function DruidTree:OnLoadRosterFrame(this)
+	-- 初始显示仓库
+	if self.db.profile.show then
+		DruidTreeRosterFrame:Show()
+	end
+end
+
 -- 更新名单框架
 function DruidTree:OnUpdateRosterFrame(this)
 	local parentName = this:GetName()
 	local UpButton = getglobal(parentName .. "UpButton")
 	local DownButton = getglobal(parentName .. "DownButton")
-	local size = table.getn(rosters)
+	local size = table.getn(self.db.profile.rosters)
 	if (size < 11) then
 		-- 不足多页
 		this.Offset = 0
@@ -1042,10 +1033,10 @@ end
 function DruidTree:OnClickJoinButton(this)
 	if UnitIsFriend("player", "target") then
 		local name = UnitName("target")
-		if Array:InList(rosters, name) then
+		if Array:InList(self.db.profile.rosters, name) then
 			Prompt:Warning("<%s>已在名单中", name)
 		else
-			table.insert(rosters, name)
+			table.insert(self.db.profile.rosters, name)
 			DruidTreeRosterFrame.UpdateYourself = true
 			Prompt:Info("已将<%s>加入名单", name)
 		end
@@ -1056,7 +1047,7 @@ end
 
 -- 单击清空按钮
 function DruidTree:OnClickClearButton(this)
-	rosters = {}
+	self.db.profile.rosters = {}
 	DruidTreeRosterFrame.UpdateYourself = true
 	Prompt:Info("已清空名单")
 end
@@ -1066,25 +1057,22 @@ function DruidTree:OnUpdateRosterButton(this)
 	local parentName = this:GetName()
 	local NameText = getglobal(parentName .. "NameText")
 	local index = tonumber(this:GetID())
-	if index then
-		local name = rosters[index]
-		if name then
-			NameText:SetText(index .. " - " .. name)
-		else
-			NameText:SetText("错误 - 索引异常")
-		end
+	local name = self.db.profile.rosters[index]
+	if name then
+		NameText:SetText(index .. " - " .. name)
 	else
-		NameText:SetText("错误 - 索引无效")
+		NameText:SetText("错误 - 索引异常")
 	end
 end
 
 -- 单击名单按钮
 function DruidTree:OnClickRosterButton(this)
 	local index = tonumber(this:GetID())
-	if rosters[index] then
-		table.remove(rosters, index)
+	local name = self.db.profile.rosters[index]
+	if name then
+		table.remove(self.db.profile.rosters, index)
 		DruidTreeRosterFrame.UpdateYourself = true
-		Prompt:Info("已将<%s>移出名单", rosters[index])
+		Prompt:Info("已将<%s>移出名单", name)
 	else
 		Prompt:Warning("名单索引<%d>异常", index)
 	end
