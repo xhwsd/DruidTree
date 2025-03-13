@@ -983,9 +983,9 @@ end
 -- 载入名单框架
 function DruidTree:OnLoadRosterFrame(this)
 	-- 初始显示仓库
-	if self.db.profile.show then
-		DruidTreeRosterFrame:Show()
-	end
+	-- if self.db.profile.show then
+	-- 	DruidTreeRosterFrame:Show()
+	-- end
 end
 
 -- 更新名单框架
