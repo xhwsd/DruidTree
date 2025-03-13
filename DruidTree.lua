@@ -72,7 +72,7 @@ function DruidTree:OnInitialize()
 			interrupt = true,
 			-- 起始
 			start = 2,
-			-- 回春术
+			-- 补回春
 			rejuvenation = true
 		},
 		-- 治疗队伍
@@ -101,7 +101,10 @@ function DruidTree:OnInitialize()
 		endeavor = {
 			-- 迅捷治愈
 			swiftmend = 2000,
-			swiftness = 40
+			-- 自然迅捷
+			swiftness = 40,
+			-- 回春术
+			rejuvenation = true,
 		},
 		-- 节省治疗
 		economize = {
@@ -165,6 +168,7 @@ function DruidTree:OnEnable()
 						order = 2,
 						min = 0,
 						max = 100,
+						step = 1,
 						get = function()
 							return self.db.profile.select.start
 						end,
@@ -199,6 +203,7 @@ function DruidTree:OnEnable()
 						order = 2,
 						min = 0,
 						max = 100,
+						step = 1,
 						get = function()
 							return self.db.profile.roster.start
 						end,
@@ -245,6 +250,7 @@ function DruidTree:OnEnable()
 						order = 2,
 						min = 0,
 						max = 100,
+						step = 1,
 						get = function()
 							return self.db.profile.party.start
 						end,
@@ -279,6 +285,7 @@ function DruidTree:OnEnable()
 						order = 2,
 						min = 0,
 						max = 100,
+						step = 1,
 						get = function()
 							return self.db.profile.raid.start
 						end,
@@ -289,11 +296,16 @@ function DruidTree:OnEnable()
 				}
 			},
 			-- 模式
+			mode = {
+				type = "header",
+				name = "模式",
+				order = 5,
+			},
 			overdose = {
 				type = "group",
 				name = "过量治疗",
 				desc = "治疗选择时使用",
-				order = 5,
+				order = 6,
 				args = {
 					swiftmend = {
 						type = "text",
@@ -320,6 +332,7 @@ function DruidTree:OnEnable()
 						order = 2,
 						min = 0,
 						max = 100,
+						step = 1,
 						get = function()
 							return self.db.profile.overdose.swiftness
 						end,
@@ -333,7 +346,7 @@ function DruidTree:OnEnable()
 				type = "group",
 				name = "尽力治疗",
 				desc = "治疗选择、名单、队伍时使用",
-				order = 6,
+				order = 7,
 				args = {
 					swiftmend = {
 						type = "text",
@@ -360,11 +373,24 @@ function DruidTree:OnEnable()
 						order = 2,
 						min = 0,
 						max = 100,
+						step = 1,
 						get = function()
 							return self.db.profile.endeavor.swiftness
 						end,
 						set = function(value)
 							self.db.profile.endeavor.swiftness = value
+						end
+					},
+					rejuvenation = {
+						type = "toggle",
+						name = "用回春术",
+						desc = "是否用回春术",
+						order = 3,
+						get = function()
+							return self.db.profile.endeavor.rejuvenation
+						end,
+						set = function(value)
+							self.db.profile.endeavor.rejuvenation = value
 						end
 					}
 				}
@@ -373,7 +399,7 @@ function DruidTree:OnEnable()
 				type = "group",
 				name = "节省治疗",
 				desc = "治疗团队时使用",
-				order = 7,
+				order = 8,
 				args = {
 					swiftmend = {
 						type = "text",
@@ -400,6 +426,7 @@ function DruidTree:OnEnable()
 						order = 2,
 						min = 0,
 						max = 100,
+						step = 1,
 						get = function()
 							return self.db.profile.economize.swiftness
 						end,
@@ -409,11 +436,12 @@ function DruidTree:OnEnable()
 					},
 					regrowth = {
 						type = "range",
-						name = "愈合",
+						name = "愈合等级",
 						desc = "限定愈合的法术等级",
 						order = 3,
 						min = 1,
 						max = 8,
+						step = 1,
 						get = function()
 							return self.db.profile.economize.regrowth
 						end,
@@ -423,12 +451,17 @@ function DruidTree:OnEnable()
 					}
 				}
 			},
+			other = {
+				type = "header",
+				name = "其它",
+				order = 8,
+			},
 			-- 其它
 			debug = {
 				type = "toggle",
 				name = "调试模式",
 				desc = "开启或关闭调试模式",
-				order = 8,
+				order = 9,
 				get = "IsDebugging",
 				set = "SetDebugging"
 			},	
@@ -436,9 +469,10 @@ function DruidTree:OnEnable()
 				type = "range",
 				name = "调试等级",
 				desc = "设置或获取调试等级",
-				order = 9,
+				order = 10,
 				min = 1,
 				max = 3,
+				step = 1,
 				get = "GetDebugLevel",
 				set = "SetDebugLevel"
 			}
@@ -728,7 +762,7 @@ function DruidTree:EndeavorHeal(start, unit)
 		self:CastSpell("迅捷治愈", unit)
 	elseif Health:GetRemaining(unit) <= self.db.profile.endeavor.swiftness and Spell:IsReady("自然迅捷") then
 		self:CastSpell("自然迅捷")
-	elseif not Effect:FindName("回春术", unit) then
+	elseif self.db.profile.endeavor.rejuvenation and not Effect:FindName("回春术", unit) then
 		self:CastSpell(self:AdaptRank("回春术", lose, unit), unit)
 	else
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)

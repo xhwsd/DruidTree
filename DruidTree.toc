@@ -3,7 +3,7 @@
 ## Title-zhCN: |CFF33AAFF[德鲁伊]|R树德
 ## Notes-zhCN: 适配乌龟服的树德辅助插件
 ## Author: 王胖子(xhwsd@qq.com)
-## Version: 2.2.2
+## Version: 2.2.3
 ## Dependencies: !Libs
 ## OptionalDeps: AceConsole-2.0, AceDebug-2.0, FuBarPlugin-2.0, AceLibrary, Tablet-2.0, RosterLib-2.0
 ## SavedVariablesPerCharacter: DruidTreeDB
