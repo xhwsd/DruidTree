@@ -133,6 +133,7 @@ end
 -- 插件打开
 function DruidTree:OnEnable()
 	self:LevelDebug(3, "插件打开")
+	
 	-- 注册菜单项
 	self.OnMenuRequest = {
 		type = "group",
@@ -443,6 +444,11 @@ function DruidTree:OnEnable()
 			}
 		}
 	}
+
+	-- 初始显示窗口
+	if self.db.profile.show then
+		DruidTreeRosterFrame:Show()
+	end
 end
 
 -- 插件关闭
@@ -980,14 +986,6 @@ function DruidTree:Heal()
 		return true
 	end
 	return false
-end
-
--- 载入名单框架
-function DruidTree:OnLoadRosterFrame(this)
-	-- 初始显示窗口
-	-- if self.db.profile.show then
-	-- 	DruidTreeRosterFrame:Show()
-	-- end
 end
 
 -- 更新名单框架
