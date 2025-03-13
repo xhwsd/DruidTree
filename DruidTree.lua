@@ -53,7 +53,7 @@ function DruidTree:OnInitialize()
 	-- 开启调试
 	self:SetDebugging(true)
 	-- 调试等级
-	self:SetDebugLevel(3)
+	self:SetDebugLevel(2)
 	-- 具体图标
 	self.hasIcon = true
 	-- 小地图图标
