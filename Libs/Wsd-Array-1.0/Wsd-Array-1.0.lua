@@ -32,7 +32,7 @@ local function external(self, major, instance)
 
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 检验是否是索引表，可使用`ipairs`遍历
 ---@param data any 数据
@@ -105,7 +105,7 @@ function Library:InAssoc(assoc, data)
 	end
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)

@@ -32,7 +32,7 @@ local function external(self, major, instance)
 
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 信息
 ---@param message string 提示信息
@@ -75,7 +75,7 @@ function Library:Error(message, ...)
 	end
 	UIErrorsFrame:AddMessage(message, 1.0, 0.0, 0.0, 53, 5)
 end
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)

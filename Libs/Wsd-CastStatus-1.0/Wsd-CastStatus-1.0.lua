@@ -100,7 +100,7 @@ local function external(self, major, instance)
 	end
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 施法
 local cast = {
@@ -230,7 +230,7 @@ function Library:GetTarget()
 	return cast.target
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)

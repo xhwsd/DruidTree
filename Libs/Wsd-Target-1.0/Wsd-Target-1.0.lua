@@ -42,7 +42,7 @@ local function external(self, major, instance)
 
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 目标
 local targets = {}
@@ -159,7 +159,7 @@ function Library:ToLast()
 	return true
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)

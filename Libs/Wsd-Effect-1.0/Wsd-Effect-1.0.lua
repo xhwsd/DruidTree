@@ -42,7 +42,7 @@ local function external(self, major, instance)
 
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 查找单位效果名称
 ---@param name string 效果名称
@@ -106,7 +106,7 @@ function Library:FindName(name, unit)
 	end
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)

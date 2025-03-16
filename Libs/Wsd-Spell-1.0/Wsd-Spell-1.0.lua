@@ -60,7 +60,7 @@ local function external(self, major, instance)
 
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 检验法术的冷却时间是否结束
 ---@param spell string 法术名称
@@ -104,7 +104,7 @@ function Library:parseText(text)
 	end
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)

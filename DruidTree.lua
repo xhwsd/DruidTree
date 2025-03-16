@@ -15,14 +15,6 @@ DruidTree = AceLibrary("AceAddon-2.0"):new(
 	-- 小地图菜单
 	"FuBarPlugin-2.0"
 )
--- DruidTree.hasIcon = "Interface\\Icons\\Ability_Druid_ForceofNature"
--- DruidTree.defaultPosition = "LEFT"
--- DruidTree.defaultMinimapPosition = 210
--- DruidTree.cannotDetachTooltip = true
--- DruidTree.tooltipHiddenWhenEmpty = true
--- DruidTree.hideWithoutStandby = true
--- DruidTree.clickableTooltip = false
--- DruidTree.hasNoColor = true
 
 -- 提示
 local Tablet = AceLibrary("Tablet-2.0")
@@ -126,17 +118,16 @@ function DruidTree:OnInitialize()
 	self.hasIcon = true
 	-- 小地图图标
 	self:SetIcon("Interface\\Icons\\Ability_Druid_ForceofNature")
+	-- 默认位置
+	self.defaultPosition = "LEFT"
+	-- 默认小地图位置
+	self.defaultMinimapPosition = 210
+	-- 无法分离提示（标签）
+	self.cannotDetachTooltip = false
 	-- 角色独立配置
 	self.independentProfile = true
 	-- 挂载时是否隐藏
 	self.hideWithoutStandby = false
-	-- self:UpdateTooltip()
-end
-
--- 插件打开
-function DruidTree:OnEnable()
-	self:LevelDebug(3, "插件打开")
-	
 	-- 注册菜单项
 	self.OnMenuRequest = {
 		type = "group",
@@ -478,6 +469,11 @@ function DruidTree:OnEnable()
 			}
 		}
 	}
+end
+
+-- 插件打开
+function DruidTree:OnEnable()
+	self:LevelDebug(3, "插件打开")
 
 	-- 恢复窗口显示
 	if self.db.profile.show then

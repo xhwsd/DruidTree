@@ -32,7 +32,7 @@ local function external(self, major, instance)
 
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 取生命损失
 ---@param unit? string 单位；缺省为`player`
@@ -63,7 +63,7 @@ function Library:GetRemaining(unit)
 	return math.floor(residual / max * 100), residual, max
 end
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+--------------------------------
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
