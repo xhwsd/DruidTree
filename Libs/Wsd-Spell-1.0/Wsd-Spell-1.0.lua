@@ -1,6 +1,6 @@
 --[[
 Name: Wsd-Spell-1.0
-Revision: $Rev: 10001 $
+Revision: $Rev: 10002 $
 Author(s): xhwsd
 Website: https://github.com/xhwsd
 Description: 法术相关操作库。
@@ -10,7 +10,7 @@ Dependencies: AceLibrary, SpellCache-1.0
 -- 主要版本
 local MAJOR_VERSION = "Wsd-Spell-1.0"
 -- 次要版本
-local MINOR_VERSION = "$Revision: 10001 $"
+local MINOR_VERSION = "$Revision: 10002 $"
 
 -- 检验AceLibrary
 if not AceLibrary then
@@ -61,6 +61,13 @@ local function external(self, major, instance)
 end
 
 --------------------------------
+
+-- 自动攻击
+function Library:AutoAttack()
+	if not PlayerFrame.inCombat then
+		CastSpellByName("攻击")
+	end
+end
 
 -- 检验法术的冷却时间是否结束
 ---@param spell string 法术名称

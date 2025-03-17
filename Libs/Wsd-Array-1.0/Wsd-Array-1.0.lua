@@ -12,6 +12,16 @@ local MAJOR_VERSION = "Wsd-Array-1.0"
 -- 次要版本
 local MINOR_VERSION = "$Revision: 10001 $"
 
+-- 检验AceLibrary
+if not AceLibrary then
+	error(MAJOR_VERSION .. " requires AceLibrary")
+end
+
+-- 检验版本（本库，单实例）
+if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
+	return
+end
+
 -- 数组相关库。
 ---@class Wsd-Array-1.0
 local Library = {}

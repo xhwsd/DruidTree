@@ -1,6 +1,6 @@
 --[[
 Name: Wsd-Target-1.0
-Revision: $Rev: 10220 $
+Revision: $Rev: 10001 $
 Author(s): xhwsd
 Website: https://github.com/xhwsd
 Description: 目标切换相关操作库。
@@ -10,7 +10,7 @@ Dependencies: AceLibrary
 -- 主要版本
 local MAJOR_VERSION = "Wsd-Target-1.0"
 -- 次要版本
-local MINOR_VERSION = "$Revision: 10220 $"
+local MINOR_VERSION = "$Revision: 10001 $"
 
 -- 检验AceLibrary
 if not AceLibrary then
