@@ -445,14 +445,14 @@ function DruidTree:OnInitialize()
 			other = {
 				type = "header",
 				name = "其它",
-				order = 8,
+				order = 9,
 			},
 			-- 其它
 			debug = {
 				type = "toggle",
 				name = "调试模式",
 				desc = "开启或关闭调试模式",
-				order = 9,
+				order = 10,
 				get = "IsDebugging",
 				set = "SetDebugging"
 			},	
@@ -460,7 +460,7 @@ function DruidTree:OnInitialize()
 				type = "range",
 				name = "调试等级",
 				desc = "设置或获取调试等级",
-				order = 10,
+				order = 11,
 				min = 1,
 				max = 3,
 				step = 1,

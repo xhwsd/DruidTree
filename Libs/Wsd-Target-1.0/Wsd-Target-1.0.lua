@@ -163,4 +163,5 @@ end
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
+---@diagnostic disable-next-line: cast-local-type
 Library = nil
