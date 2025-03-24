@@ -1,6 +1,6 @@
 ## Interface: 11200
 ## Title: DruidTree
-## Title-zhCN: |CFF33AAFF[德鲁伊]|R树德
+## Title-zhCN: |CFF33AAFF[德鲁伊]|R树德 v2.2.3
 ## Notes-zhCN: 适配乌龟服的树德辅助插件
 ## Author: 王胖子(xhwsd@qq.com)
 ## Version: 2.2.3

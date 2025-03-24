@@ -117,7 +117,7 @@ function DruidTree:OnInitialize()
 	-- 具体图标
 	self.hasIcon = true
 	-- 小地图图标
-	self:SetIcon("Interface\\Icons\\Ability_Druid_ForceofNature")
+	self:SetIcon("Interface\\Icons\\Ability_Druid_TreeofLife")
 	-- 默认位置
 	self.defaultPosition = "LEFT"
 	-- 默认小地图位置
@@ -486,12 +486,6 @@ function DruidTree:OnDisable()
 	self:LevelDebug(3, "插件关闭")
 end
 
--- 取标题
-function DruidTree:GetTitle()
-	-- 置小地图图标点燃标题
-	return "树德 v" .. GetAddOnMetadata("DruidTree", "Version")
-end
-
 -- 提示更新
 function DruidTree:OnTooltipUpdate()
 	-- 置小地图图标点燃提示
@@ -579,7 +573,7 @@ function DruidTree:CastSpell(spell, unit)
 		if UnitIsUnit(unit, "player") then
 			-- 自我施法
 			Prompt:Info("对自己施放<%s>", spell)
-			CastSpellByName(spell, 1)
+			CastSpellByName(spell, true)
 			return true
 		elseif Target:ToUnit(unit) then
 			-- 目标施法
