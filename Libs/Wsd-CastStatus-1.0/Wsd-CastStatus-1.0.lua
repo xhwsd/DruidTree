@@ -1,7 +1,7 @@
 --[[
 Name: Wsd-CastStatus-1.0
 Revision: $Rev: 10001 $
-Author(s): xhwsd
+Author(s): 树先生 (xhwsd@qq.com)
 Website: https://github.com/xhwsd
 Description: 施法状态相关操作库。
 Dependencies: AceLibrary, AceEvent-2.0, AceHook-2.1, SpellCache-1.0, Gratuity-2.0
@@ -57,14 +57,20 @@ local Library = {}
 ---@param oldLib table 旧版库对象
 ---@param oldDeactivate function 旧版库停用函数
 local function activate(self, oldLib, oldDeactivate)
+	-- 新版本使用
 	Library = self
 
+	-- 旧版本释放
 	if oldLib then
 		oldLib:UnregisterAllEvents()
 		oldLib:CancelAllScheduledEvents()
 		oldLib:UnhookAll()
 	end
 
+	-- 新版本初始化
+	-- ...
+
+	-- 旧版本停用
 	if oldDeactivate then
 		oldDeactivate(oldLib)
 	end

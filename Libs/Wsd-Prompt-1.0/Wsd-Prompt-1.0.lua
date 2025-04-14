@@ -1,10 +1,10 @@
 --[[
 Name: Wsd-Prompt-1.0
 Revision: $Rev: 10001 $
-Author(s): xhwsd
+Author(s): 树先生 (xhwsd@qq.com)
 Website: https://github.com/xhwsd
 Description: 消息提示相关库。
-Dependencies:
+Dependencies: AceLibrary
 ]]
 
 -- 主要版本
@@ -31,7 +31,21 @@ local Library = {}
 ---@param oldLib table 旧版库对象
 ---@param oldDeactivate function 旧版库停用函数
 local function activate(self, oldLib, oldDeactivate)
+	-- 新版本使用
+	Library = self
 
+	-- 旧版本释放
+	if oldLib then
+		-- ...
+	end
+
+	-- 新版本初始化
+	-- ...
+
+	-- 旧版本停用
+	if oldDeactivate then
+		oldDeactivate(oldLib)
+	end
 end
 
 -- 外部库加载

@@ -3,7 +3,8 @@
 > __自娱自乐，不做任何保证！__  
 > 如遇到BUG可反馈至 xhwsd@qq.com 邮箱
 
-<img src="Preview.png" width="50%" />
+![功能预览](Preview.png)
+
 
 ## 功能
 - 可视化设置
@@ -106,4 +107,4 @@
 
 
 ## 参考天赋
-<img src="Talent.png" width="80%" />
+[![跳转至天赋模拟器](Talent.png)](https://talents.turtle-wow.org/druid?points=oAAbYIAYAAAAAAAAAAAAAAAAAAAAFAFADNDFAAFABAA=)

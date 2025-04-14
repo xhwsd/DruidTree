@@ -1,7 +1,7 @@
 --[[
 Name: Wsd-Slot-1.0
 Revision: $Rev: 10001 $
-Author(s): xhwsd
+Author(s): 树先生 (xhwsd@qq.com)
 Website: https://github.com/xhwsd
 Description: 法术插槽相关操作库。
 Dependencies: AceLibrary, Gratuity-2.0, SpellCache-1.0
@@ -34,7 +34,7 @@ end
 
 CheckDependency({
 	-- 提示解析
-	"Gratuity-2.0", 
+	"Gratuity-2.0",
 	-- 法术缓存
 	"SpellCache-1.0"
 })
@@ -52,7 +52,22 @@ local Library = {}
 ---@param oldLib table 旧版库对象
 ---@param oldDeactivate function 旧版库停用函数
 local function activate(self, oldLib, oldDeactivate)
+	-- 使用新版本
+	Library = self
 
+	if oldLib then
+		-- 旧版本施放操作
+		-- 旧版本数据传递到新版本
+		-- ...
+	end
+
+	-- 新版本初始化
+	-- ...
+
+	-- 停用旧版本
+	if oldDeactivate then
+		oldDeactivate(oldLib)
+	end
 end
 
 -- 外部库加载

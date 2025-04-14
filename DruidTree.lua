@@ -23,20 +23,20 @@ local RosterLib = AceLibrary("RosterLib-2.0")
 
 ---@type Wsd-Array-1.0
 local Array = AceLibrary("Wsd-Array-1.0")
+---@type Wsd-Buff-1.0
+local Buff = AceLibrary("Wsd-Buff-1.0")
+---@type Wsd-CastStatus-1.0
+local CastStatus = AceLibrary("Wsd-CastStatus-1.0")
 ---@type Wsd-Health-1.0
 local Health = AceLibrary("Wsd-Health-1.0")
 ---@type Wsd-Prompt-1.0
 local Prompt = AceLibrary("Wsd-Prompt-1.0")
----@type Wsd-Effect-1.0
-local Effect = AceLibrary("Wsd-Effect-1.0")
----@type Wsd-Spell-1.0
-local Spell = AceLibrary("Wsd-Spell-1.0")
 ---@type Wsd-Slot-1.0
 local Slot = AceLibrary("Wsd-Slot-1.0")
+---@type Wsd-Spell-1.0
+local Spell = AceLibrary("Wsd-Spell-1.0")
 ---@type Wsd-Target-1.0
 local Target = AceLibrary("Wsd-Target-1.0")
----@type Wsd-CastStatus-1.0
-local CastStatus = AceLibrary("Wsd-CastStatus-1.0")
 
 -- 插件载入
 function DruidTree:OnInitialize()
@@ -709,13 +709,13 @@ function DruidTree:OverdoseHeal(unit)
 	-- 过量治疗
 	local percentage, lose = Health:GetLose(unit)
 	self:LevelDebug(3, "过量治疗；目标：%s；损失：%d", UnitName(unit), percentage)
-	if Effect:FindName("自然迅捷") then
+	if Buff:GetUnit("自然迅捷") then
 		self:CastSpell("愈合", unit)
-	elseif lose >= self.db.profile.overdose.swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
+	elseif lose >= self.db.profile.overdose.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:GetUnit("愈合", unit) or Buff:GetUnit("回春术", unit)) then
 		self:CastSpell("迅捷治愈", unit)
 	elseif Health:GetRemaining(unit) <= self.db.profile.overdose.swiftness and Spell:IsReady("自然迅捷") then
 		self:CastSpell("自然迅捷")
-	elseif not Effect:FindName("回春术", unit) then
+	elseif not Buff:GetUnit("回春术", unit) then
 		self:CastSpell("回春术", unit)
 	else
 		self:CastSpell("愈合", unit)
@@ -746,13 +746,13 @@ function DruidTree:EndeavorHeal(start, unit)
 
 	-- 尽力治疗
 	self:LevelDebug(3, "尽力治疗；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
-	if Effect:FindName("自然迅捷", "player") then
+	if Buff:GetUnit("自然迅捷", "player") then
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
-	elseif lose >= self.db.profile.endeavor.swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
+	elseif lose >= self.db.profile.endeavor.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:GetUnit("愈合", unit) or Buff:GetUnit("回春术", unit)) then
 		self:CastSpell("迅捷治愈", unit)
 	elseif Health:GetRemaining(unit) <= self.db.profile.endeavor.swiftness and Spell:IsReady("自然迅捷") then
 		self:CastSpell("自然迅捷")
-	elseif self.db.profile.endeavor.rejuvenation and not Effect:FindName("回春术", unit) then
+	elseif self.db.profile.endeavor.rejuvenation and not Buff:GetUnit("回春术", unit) then
 		self:CastSpell(self:AdaptRank("回春术", lose, unit), unit)
 	else
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
@@ -783,9 +783,9 @@ function DruidTree:EconomizeHeal(start, unit)
 
 	-- 节省治疗
 	self:LevelDebug(3, "节省治疗；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
-	if Effect:FindName("自然迅捷", "player") then
+	if Buff:GetUnit("自然迅捷", "player") then
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
-	elseif lose >= self.db.profile.economize.swiftmend and Spell:IsReady("迅捷治愈") and (Effect:FindName("愈合", unit) or Effect:FindName("回春术", unit)) then
+	elseif lose >= self.db.profile.economize.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:GetUnit("愈合", unit) or Buff:GetUnit("回春术", unit)) then
 		self:CastSpell("迅捷治愈", unit)
 	elseif Health:GetRemaining(unit) <= self.db.profile.economize.swiftness and Spell:IsReady("自然迅捷") then
 		self:CastSpell("自然迅捷")
@@ -883,14 +883,14 @@ function DruidTree:AddedBuff(buff, spell)
 	for _, name in ipairs(self.db.profile.rosters) do
 		local unit = RosterLib:GetUnitIDFromName(name)
 		if unit then
-			if not Effect:FindName(buff, unit) and self:CanHeal(unit) then
+			if not Buff:GetUnit(buff, unit) and self:CanHeal(unit) then
 				-- 补充增益
 				self:LevelDebug(3, "补充名单增益；目标：%s；法术：%s", UnitName(unit), spell)   
 				self:CastSpell(spell, unit)
 				return name
 			end
 		elseif Target:ToName(name) then
-			if not Effect:FindName(buff, "target") and self:CanHeal("target") then
+			if not Buff:GetUnit(buff, "target") and self:CanHeal("target") then
 				-- 补充增益
 				self:LevelDebug(3, "补充名单增益；目标：%s；法术：%s", UnitName("target"), spell)  
 				self:CastSpell(spell, "target")
@@ -1101,7 +1101,11 @@ function DruidTree:OnClickRosterButton(this)
 	local index = tonumber(this:GetID())
 	local name = self.db.profile.rosters[index]
 	if name then
-		table.remove(self.db.profile.rosters, index)
+		local rosters = self.db.profile.rosters
+		-- 无法直接以 self.db.profile.rosters 删除
+		table.remove(rosters, index)
+		self.db.profile.rosters = rosters
+
 		DruidTreeRosterFrame.UpdateYourself = true
 		Prompt:Info("已将<%s>移出名单", name)
 	else

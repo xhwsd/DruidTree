@@ -1,21 +1,21 @@
 ## Interface: 11200
 ## Title: DruidTree
-## Title-zhCN: |CFF33AAFF[德鲁伊]|R树德 v2.2.3
+## Title-zhCN: |CFF33AAFF[Wsd]|R树德 v2.2.4
 ## Notes-zhCN: 适配乌龟服的树德辅助插件
-## Author: 王胖子(xhwsd@qq.com)
-## Version: 2.2.3
+## Author: 树先生 (xhwsd@qq.com)
+## Version: 2.2.4
 ## Dependencies: !Libs
-## OptionalDeps: AceConsole-2.0, AceDebug-2.0, FuBarPlugin-2.0, AceLibrary, Tablet-2.0, RosterLib-2.0
+## OptionalDeps: AceLibrary, AceConsole-2.0, AceDebug-2.0, FuBarPlugin-2.0, Tablet-2.0, RosterLib-2.0
 ## SavedVariablesPerCharacter: DruidTreeDB
 
 Libs\Wsd-Array-1.0\Wsd-Array-1.0.lua
+Libs\Wsd-Buff-1.0\Wsd-Buff-1.0.lua
+Libs\Wsd-CastStatus-1.0\Wsd-CastStatus-1.0.lua 
 Libs\Wsd-Health-1.0\Wsd-Health-1.0.lua
 Libs\Wsd-Prompt-1.0\Wsd-Prompt-1.0.lua
-Libs\Wsd-Effect-1.0\Wsd-Effect-1.0.lua
-Libs\Wsd-Spell-1.0\Wsd-Spell-1.0.lua 
 Libs\Wsd-Slot-1.0\Wsd-Slot-1.0.lua 
+Libs\Wsd-Spell-1.0\Wsd-Spell-1.0.lua 
 Libs\Wsd-Target-1.0\Wsd-Target-1.0.lua
-Libs\Wsd-CastStatus-1.0\Wsd-CastStatus-1.0.lua 
 
 DruidTree.lua
 DruidTree.xml
