@@ -708,7 +708,7 @@ function DruidTree:OverdoseHeal(unit)
 
 	-- 过量治疗
 	local percentage, lose = Health:GetLose(unit)
-	self:LevelDebug(3, "过量治疗；目标：%s；损失：%d", UnitName(unit), percentage)
+	self:LevelDebug(3, "过量治疗；目标：%s；损失：%d；失血：%d", UnitName(unit), percentage, lose)
 	if Buff:GetUnit("自然迅捷") then
 		self:CastSpell("愈合", unit)
 	elseif lose >= self.db.profile.overdose.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:GetUnit("愈合", unit) or Buff:GetUnit("回春术", unit)) then
@@ -740,12 +740,12 @@ function DruidTree:EndeavorHeal(start, unit)
 	-- 生命损失
 	local percentage, lose = Health:GetLose(unit)
 	if percentage < start then
-		self:LevelDebug(3, "尽力治疗，未达到起始损失；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
+		self:LevelDebug(3, "尽力治疗，未达到起始损失；目标：%s；起始：%d；损失：%d；失血：%d", UnitName(unit), start, percentage, lose)
 		return false
 	end
 
 	-- 尽力治疗
-	self:LevelDebug(3, "尽力治疗；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
+	self:LevelDebug(3, "尽力治疗；目标：%s；起始：%d；损失：%d；失血：%d", UnitName(unit), start, percentage, lose)
 	if Buff:GetUnit("自然迅捷", "player") then
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
 	elseif lose >= self.db.profile.endeavor.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:GetUnit("愈合", unit) or Buff:GetUnit("回春术", unit)) then
@@ -777,12 +777,12 @@ function DruidTree:EconomizeHeal(start, unit)
 	-- 生命损失
 	local percentage, lose = Health:GetLose(unit)
 	if percentage < start then
-		self:LevelDebug(3, "节省治疗，未达到起始损失；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
+		self:LevelDebug(3, "节省治疗，未达到起始损失；目标：%s；起始：%d；损失：%d；失血：%d", UnitName(unit), start, percentage, lose)
 		return false
 	end
 
 	-- 节省治疗
-	self:LevelDebug(3, "节省治疗；目标：%s；起始：%d；损失：%d", UnitName(unit), start, percentage)
+	self:LevelDebug(3, "节省治疗；目标：%s；起始：%d；损失：%d；失血：%d", UnitName(unit), start, percentage, lose)
 	if Buff:GetUnit("自然迅捷", "player") then
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
 	elseif lose >= self.db.profile.economize.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:GetUnit("愈合", unit) or Buff:GetUnit("回春术", unit)) then
@@ -1101,11 +1101,7 @@ function DruidTree:OnClickRosterButton(this)
 	local index = tonumber(this:GetID())
 	local name = self.db.profile.rosters[index]
 	if name then
-		local rosters = self.db.profile.rosters
-		-- 无法直接以 self.db.profile.rosters 删除
-		table.remove(rosters, index)
-		self.db.profile.rosters = rosters
-
+		table.remove(self.db.profile.rosters, index)
 		DruidTreeRosterFrame.UpdateYourself = true
 		Prompt:Info("已将<%s>移出名单", name)
 	else
