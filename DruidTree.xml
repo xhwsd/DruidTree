@@ -23,18 +23,18 @@
 				-->
 			</OnLoad>
 			<OnShow>
-				this.UpdateYourself = true
+				this.updateYourself = true
 			</OnShow>
 			<OnUpdate>
-				if this.UpdateYourself then
-					this.UpdateYourself = false
+				if this.updateYourself then
+					this.updateYourself = false
 					DruidTree:OnUpdateRosterButton(this)
 				end
 			</OnUpdate>
 			<OnEnter>
 			    DruidTreeTooltip:SetOwner(this, "ANCHOR_TOPRIGHT")
 				DruidTreeTooltip:ClearLines()
-				DruidTreeTooltip:SetText("将该名称移出名单")
+				DruidTreeTooltip:SetText("点击将其移出名单")
 				DruidTreeTooltip:Show()
 			</OnEnter>
 			<OnLeave>
@@ -68,14 +68,14 @@
 		</Backdrop>
 		<Scripts>
             <OnLoad>
-                this.Offset = 0
+                this.offset = 0
             </OnLoad>
             <OnShow>
-                this.UpdateYourself = true
+                this.updateYourself = true
             </OnShow>
             <OnUpdate>
-				if this.UpdateYourself then
-					this.UpdateYourself = false
+				if this.updateYourself then
+					this.updateYourself = false
 					DruidTree:OnUpdateRosterFrame(this)
 				end
             </OnUpdate>
@@ -202,8 +202,8 @@
 						DruidTreeTooltip:Hide()
 					</OnLeave>
                     <OnClick>
-                        this:GetParent().Offset = this:GetParent().Offset - 1
-                        this:GetParent().UpdateYourself = true
+                        this:GetParent().offset = this:GetParent().offset - 1
+                        this:GetParent().updateYourself = true
                     </OnClick>
                 </Scripts>
             </Button>
@@ -231,8 +231,8 @@
 						DruidTreeTooltip:Hide()
 					</OnLeave>
                     <OnClick>
-                        this:GetParent().Offset = this:GetParent().Offset + 1
-                        this:GetParent().UpdateYourself = true
+                        this:GetParent().offset = this:GetParent().offset + 1
+                        this:GetParent().updateYourself = true
                     </OnClick>
                 </Scripts>
             </Button>

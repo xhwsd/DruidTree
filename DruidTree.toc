@@ -19,3 +19,4 @@ Libs\Wsd-Target-1.0\Wsd-Target-1.0.lua
 
 DruidTree.lua
 DruidTree.xml
+Helper.lua

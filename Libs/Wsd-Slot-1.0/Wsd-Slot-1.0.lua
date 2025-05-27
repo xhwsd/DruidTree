@@ -86,7 +86,7 @@ local spellCaches = {}
 -- 检验值是否包含于索引数组中
 ---@param list any 列表
 ---@param data any 值
----@return integer index 返回索引
+---@return number index 返回索引
 local function InList(list, data)
 	if type(list) == "table" then
 		for index, value in ipairs(list) do
@@ -98,7 +98,7 @@ local function InList(list, data)
 end
 
 -- 取插槽法术图标
----@param slot integer 插槽索引
+---@param slot number 插槽索引
 ---@return string icon 图标纹理
 local function GetSpellIcon(slot)
 	-- 普通法术没有文本
@@ -108,24 +108,24 @@ local function GetSpellIcon(slot)
 end
 
 -- 检验插槽是否为宏
----@param slot integer 插槽索引；从1开始
+---@param slot number 插槽索引；从1开始
 ---@return boolean is 是否为宏
 function Library:IsMacro(slot)
 	return slot and HasAction(slot) and GetActionText(slot) ~= nil
 end
 
 -- 检验插槽是否法术（非宏）
----@param slot integer 插槽索引；从1开始
+---@param slot number 插槽索引；从1开始
 ---@return boolean is 是否为法术
 function Library:IsSpell(slot)
 	return slot and HasAction(slot) and not GetActionText(slot)
 end
 
 -- 取插槽法术信息
----@param slot integer 插槽索引；从1开始
+---@param slot number 插槽索引；从1开始
 ---@return string name 法术名称
----@return integer rank 法术等级
----@return integer id 法术索引；从1开始
+---@return number rank 法术等级
+---@return number id 法术索引；从1开始
 function Library:GetSpell(slot)
 	-- 仅限法术插槽
 	if self:IsSpell(slot) then
@@ -143,7 +143,7 @@ end
 
 -- 查找任意一个法术在动作条中的插槽索引
 ---@param ... string 法术名称
----@return integer slot 插槽索引；1~120
+---@return number slot 插槽索引；1~120
 ---@return string name 法术名称
 ---@return string icon 图标纹理
 function Library:FindSpell(...)
@@ -216,5 +216,5 @@ end
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
----@diagnostic disable-next-line: cast-local-type
+---@diagnostic disable-next-line
 Library = nil

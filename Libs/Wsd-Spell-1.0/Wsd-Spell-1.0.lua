@@ -1,6 +1,6 @@
 --[[
 Name: Wsd-Spell-1.0
-Revision: $Rev: 10005 $
+Revision: $Rev: 10006 $
 Author(s): 树先生 (xhwsd@qq.com)
 Website: https://github.com/xhwsd
 Description: 法术相关操作库。
@@ -10,7 +10,7 @@ Dependencies: AceLibrary, SpellCache-1.0
 -- 主要版本
 local MAJOR_VERSION = "Wsd-Spell-1.0"
 -- 次要版本
-local MINOR_VERSION = "$Revision: 10005 $"
+local MINOR_VERSION = "$Revision: 10006 $"
 
 -- 检验AceLibrary
 if not AceLibrary then
@@ -82,13 +82,6 @@ end
 -- 提示帧
 local WsdSpellTooltip = CreateFrame("GameTooltip", "WsdSpellTooltip", UIParent, "GameTooltipTemplate")
 
--- 自动攻击
-function Library:AutoAttack()
-	if not PlayerFrame.inCombat then
-		CastSpellByName("攻击")
-	end
-end
-
 -- 刷新法术数据
 ---@param force? boolean 强制；无视已有数据重新准备数据
 function Library:refreshData(force)
@@ -118,7 +111,7 @@ end
 -- 取指定等级法术数据
 ---@param name string 法术名称
 ---@param rank? number 法术等级；缺省为最高等级
----@return number spellIndex 成功返回法术索引，否则返回空
+---@return table data 成功返回法术数据，否则返回空
 function Library:GetData(name, rank)
 	self:refreshData()
 	if name and self.spells[name] then
@@ -232,5 +225,5 @@ end
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
----@diagnostic disable-next-line: cast-local-type
+---@diagnostic disable-next-line
 Library = nil

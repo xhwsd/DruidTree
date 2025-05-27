@@ -104,7 +104,7 @@ end
 -- 数据位与列表
 ---@param list table 列表(索引表）
 ---@param data any 数据
----@return integer|nil index 成功返回索引，失败返回空
+---@return number|nil index 成功返回索引，失败返回空
 function Library:InList(list, data)
 	if type(list) == "table" then
 		for index, value in ipairs(list) do
@@ -133,5 +133,5 @@ end
 
 -- 最终注册库
 AceLibrary:Register(Library, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
----@diagnostic disable-next-line: cast-local-type
+---@diagnostic disable-next-line
 Library = nil

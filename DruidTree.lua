@@ -107,7 +107,6 @@ function DruidTree:OnInitialize()
 			-- 愈合
 			regrowth = 4
 		},
-
 		-- 显示窗口
 		show = true,
 		-- 名单列表
@@ -442,17 +441,17 @@ function DruidTree:OnInitialize()
 					}
 				}
 			},
+			-- 其它
 			other = {
 				type = "header",
 				name = "其它",
 				order = 9,
 			},
-			-- 其它
 			debug = {
 				type = "toggle",
 				name = "调试模式",
 				desc = "开启或关闭调试模式",
-				order = 10,
+				order = 11,
 				get = "IsDebugging",
 				set = "SetDebugging"
 			},	
@@ -460,7 +459,7 @@ function DruidTree:OnInitialize()
 				type = "range",
 				name = "调试等级",
 				desc = "设置或获取调试等级",
-				order = 11,
+				order = 12,
 				min = 1,
 				max = 3,
 				step = 1,
@@ -509,7 +508,7 @@ end
 -- 到治疗单位
 ---@param unit? string 单位；缺省为（友善目标 > 自己）
 ---@return string unit 单位
-function DruidTree:ToHealUnit(unit)
+function DruidTree:ToUnit(unit)
 	-- 缺省单位
 	if not unit then
 		unit = UnitExists("target") and "target" or "player"
@@ -521,7 +520,7 @@ end
 
 -- 适配治疗法术等级
 ---@param name string 法术名称；可选值：回春术、愈合
----@param health integer 目前失血
+---@param health number 目前失血
 ---@param unit? string 治疗单位
 ---@return string spell 法术名称(含等级)
 function DruidTree:AdaptRank(name, health, unit)
@@ -557,7 +556,7 @@ function DruidTree:AdaptRank(name, health, unit)
 
 	-- 最高等级
 	return name
-end  
+end
 
 -- 施放法术
 ---@param spell string 法术名称；可包含等级
@@ -594,7 +593,7 @@ function DruidTree:CastSpell(spell, unit)
 end
 
 -- 打断治疗
----@param start? integer 起始损失百分比；缺省为`0`
+---@param start? number 起始损失百分比；缺省为`0`
 ---@return boolean stop 已打断返回真，未打断返回假
 function DruidTree:InterruptHeal(start)
 	start = start or 0
@@ -695,10 +694,10 @@ function DruidTree:CanHeal(unit)
 end
 
 -- 过量治疗单位
----@param unit? string 目标单位；缺省为`self:ToHealUnit(unit)`
+---@param unit? string 目标单位；缺省为`self:ToUnit(unit)`
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:OverdoseHeal(unit)
-	unit = self:ToHealUnit(unit)
+	unit = self:ToUnit(unit)
 
 	-- 可否治疗
 	if not self:CanHeal(unit) then
@@ -709,13 +708,13 @@ function DruidTree:OverdoseHeal(unit)
 	-- 过量治疗
 	local percentage, lose = Health:GetLose(unit)
 	self:LevelDebug(3, "过量治疗；目标：%s；损失：%d；失血：%d", UnitName(unit), percentage, lose)
-	if Buff:GetUnit("自然迅捷") then
+	if Buff:FindUnit("自然迅捷") then
 		self:CastSpell("愈合", unit)
-	elseif lose >= self.db.profile.overdose.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:GetUnit("愈合", unit) or Buff:GetUnit("回春术", unit)) then
+	elseif lose >= self.db.profile.overdose.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:FindUnit("愈合", unit) or Buff:FindUnit("回春术", unit)) then
 		self:CastSpell("迅捷治愈", unit)
 	elseif Health:GetRemaining(unit) <= self.db.profile.overdose.swiftness and Spell:IsReady("自然迅捷") then
 		self:CastSpell("自然迅捷")
-	elseif not Buff:GetUnit("回春术", unit) then
+	elseif not Buff:FindUnit("回春术", unit) then
 		self:CastSpell("回春术", unit)
 	else
 		self:CastSpell("愈合", unit)
@@ -724,12 +723,12 @@ function DruidTree:OverdoseHeal(unit)
 end
 
 -- 尽力治疗单位
----@param start? integer 起始损失百分比；缺省为`2`
----@param unit? string 目标单位；缺省为`self:ToHealUnit(unit)`
+---@param start? number 起始损失百分比；缺省为`2`
+---@param unit? string 目标单位；缺省为`self:ToUnit(unit)`
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:EndeavorHeal(start, unit)
 	start = start or 2
-	unit = self:ToHealUnit(unit)
+	unit = self:ToUnit(unit)
 
 	-- 可否治疗
 	if not self:CanHeal(unit) then
@@ -746,13 +745,13 @@ function DruidTree:EndeavorHeal(start, unit)
 
 	-- 尽力治疗
 	self:LevelDebug(3, "尽力治疗；目标：%s；起始：%d；损失：%d；失血：%d", UnitName(unit), start, percentage, lose)
-	if Buff:GetUnit("自然迅捷", "player") then
+	if Buff:FindUnit("自然迅捷", "player") then
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
-	elseif lose >= self.db.profile.endeavor.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:GetUnit("愈合", unit) or Buff:GetUnit("回春术", unit)) then
+	elseif lose >= self.db.profile.endeavor.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:FindUnit("愈合", unit) or Buff:FindUnit("回春术", unit)) then
 		self:CastSpell("迅捷治愈", unit)
 	elseif Health:GetRemaining(unit) <= self.db.profile.endeavor.swiftness and Spell:IsReady("自然迅捷") then
 		self:CastSpell("自然迅捷")
-	elseif self.db.profile.endeavor.rejuvenation and not Buff:GetUnit("回春术", unit) then
+	elseif self.db.profile.endeavor.rejuvenation and not Buff:FindUnit("回春术", unit) then
 		self:CastSpell(self:AdaptRank("回春术", lose, unit), unit)
 	else
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
@@ -761,12 +760,12 @@ function DruidTree:EndeavorHeal(start, unit)
 end
 
 -- 节省治疗单位
----@param start? integer 起始损失百分比；缺省为`4`
----@param unit? string 目标单位；缺省为`self:ToHealUnit(unit)`
+---@param start? number 起始损失百分比；缺省为`4`
+---@param unit? string 目标单位；缺省为`self:ToUnit(unit)`
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:EconomizeHeal(start, unit)
 	start = start or 4
-	unit = self:ToHealUnit(unit)
+	unit = self:ToUnit(unit)
 
 	-- 可否治疗
 	if not self:CanHeal(unit) then
@@ -783,9 +782,9 @@ function DruidTree:EconomizeHeal(start, unit)
 
 	-- 节省治疗
 	self:LevelDebug(3, "节省治疗；目标：%s；起始：%d；损失：%d；失血：%d", UnitName(unit), start, percentage, lose)
-	if Buff:GetUnit("自然迅捷", "player") then
+	if Buff:FindUnit("自然迅捷", "player") then
 		self:CastSpell(self:AdaptRank("愈合", lose, unit), unit)
-	elseif lose >= self.db.profile.economize.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:GetUnit("愈合", unit) or Buff:GetUnit("回春术", unit)) then
+	elseif lose >= self.db.profile.economize.swiftmend and Spell:IsReady("迅捷治愈") and (Buff:FindUnit("愈合", unit) or Buff:FindUnit("回春术", unit)) then
 		self:CastSpell("迅捷治愈", unit)
 	elseif Health:GetRemaining(unit) <= self.db.profile.economize.swiftness and Spell:IsReady("自然迅捷") then
 		self:CastSpell("自然迅捷")
@@ -796,7 +795,7 @@ function DruidTree:EconomizeHeal(start, unit)
 end
 
 -- 查找名单中损失最多名称
----@param start? integer 起始损失百分比；缺省为`2`
+---@param start? number 起始损失百分比；缺省为`2`
 ---@return string target 已找到返回单位，未找到否则返回空
 function DruidTree:FindRoster(start)
 	start = start or 2
@@ -826,7 +825,7 @@ function DruidTree:FindRoster(start)
 end
 
 -- 查找队伍中损失最多单位
----@param start? integer 起始损失百分比；缺省为`4`
+---@param start? number 起始损失百分比；缺省为`4`
 ---@return string target 已找到返回单位，未找到否则返回空
 function DruidTree:FindParty(start)
 	start = start or 4
@@ -853,7 +852,7 @@ function DruidTree:FindParty(start)
 end
 
 -- 查找团队中损失最多单位
----@param start? integer 起始损失百分比；缺省为`6`
+---@param start? number 起始损失百分比；缺省为`6`
 ---@return string target 已找到返回单位，未找到否则返回空
 function DruidTree:FindRaid(start)
 	start = start or 6
@@ -883,14 +882,14 @@ function DruidTree:AddedBuff(buff, spell)
 	for _, name in ipairs(self.db.profile.rosters) do
 		local unit = RosterLib:GetUnitIDFromName(name)
 		if unit then
-			if not Buff:GetUnit(buff, unit) and self:CanHeal(unit) then
+			if not Buff:FindUnit(buff, unit) and self:CanHeal(unit) then
 				-- 补充增益
 				self:LevelDebug(3, "补充名单增益；目标：%s；法术：%s", UnitName(unit), spell)   
 				self:CastSpell(spell, unit)
 				return name
 			end
 		elseif Target:ToName(name) then
-			if not Buff:GetUnit(buff, "target") and self:CanHeal("target") then
+			if not Buff:FindUnit(buff, "target") and self:CanHeal("target") then
 				-- 补充增益
 				self:LevelDebug(3, "补充名单增益；目标：%s；法术：%s", UnitName("target"), spell)  
 				self:CastSpell(spell, "target")
@@ -1020,18 +1019,18 @@ function DruidTree:OnUpdateRosterFrame(this)
 	local size = table.getn(self.db.profile.rosters)
 	if (size < 11) then
 		-- 不足多页
-		this.Offset = 0
+		this.offset = 0
 		UpButton:Hide()
 		DownButton:Hide()
 	else
-		if (this.Offset <= 0) then
+		if this.offset <= 0 then
 			-- 首页
-			this.Offset = 0
+			this.offset = 0
 			UpButton:Hide()
 			DownButton:Show()
-		elseif (this.Offset >= (size - 10)) then
+		elseif this.offset >= size - 10 then
 			-- 尾页
-			this.Offset = (size - 10)
+			this.offset = size - 10
 			UpButton:Show()
 			DownButton:Hide()
 		else
@@ -1043,9 +1042,9 @@ function DruidTree:OnUpdateRosterFrame(this)
 
 	for index = 1, 10 do
 		local RosterButton = getglobal(parentName .. "RosterButton" .. index)
-		RosterButton:SetID(index + this.Offset)
-		RosterButton.UpdateYourself = true
-		if (index <= size) then
+		RosterButton:SetID(index + this.offset)
+		RosterButton.updateYourself = true
+		if index <= size then
 			RosterButton:Show()
 		else
 			RosterButton:Hide()
@@ -1061,7 +1060,7 @@ function DruidTree:OnClickJoinButton(this)
 			Prompt:Warning("<%s>已在名单中", name)
 		else
 			table.insert(self.db.profile.rosters, name)
-			DruidTreeRosterFrame.UpdateYourself = true
+			DruidTreeRosterFrame.updateYourself = true
 			Prompt:Info("已将<%s>加入名单", name)
 		end
 	else
@@ -1072,7 +1071,7 @@ end
 -- 单击清空按钮
 function DruidTree:OnClickClearButton(this)
 	self.db.profile.rosters = {}
-	DruidTreeRosterFrame.UpdateYourself = true
+	DruidTreeRosterFrame.updateYourself = true
 	Prompt:Info("已清空名单")
 end
 
@@ -1102,7 +1101,7 @@ function DruidTree:OnClickRosterButton(this)
 	local name = self.db.profile.rosters[index]
 	if name then
 		table.remove(self.db.profile.rosters, index)
-		DruidTreeRosterFrame.UpdateYourself = true
+		DruidTreeRosterFrame.updateYourself = true
 		Prompt:Info("已将<%s>移出名单", name)
 	else
 		Prompt:Warning("名单索引<%d>异常", index)
