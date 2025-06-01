@@ -3,11 +3,10 @@
 > __自娱自乐，不做任何保证！__  
 > 如遇到BUG可反馈至 xhwsd@qq.com 邮箱
 
-
-## 功能
-
 ![功能预览](Preview.png)
 
+
+## 功能
 - 可视化设置
 - 无脑一键
 - 自定义治疗名单
@@ -16,7 +15,7 @@
 - 等...
 
 
-## 使用
+## 安装
 - 安装`!Libs`插件
 - [可选][[文档](https://github.com/xhwsd/SuperMacro/)][[下载](https://github.com/xhwsd/SuperMacro/archive/master.zip)]安装`SuperMacro`插件，安装后将获得更多宏位
 - [[文档](https://github.com/xhwsd/DruidTree/)][[下载](https://github.com/xhwsd/DruidTree/archive/main.zip)]安装`DruidTree`插件
@@ -112,7 +111,5 @@
 > 无脑主用该宏，其它宏看情况抉择！
 
 
-## 参考
-
-### 天赋
+## 参考天赋
 [![跳转至天赋模拟器](Talent.png)](https://talents.turtle-wow.org/druid?points=oAAbYIAYAAAAAAAAAAAAAAAAAAAAFAFADNDFAAFABAA=)

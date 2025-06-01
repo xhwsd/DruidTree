@@ -23,11 +23,11 @@
 				-->
 			</OnLoad>
 			<OnShow>
-				this.updateYourself = true
+				this.UpdateYourself = true
 			</OnShow>
 			<OnUpdate>
-				if this.updateYourself then
-					this.updateYourself = false
+				if this.UpdateYourself then
+					this.UpdateYourself = false
 					DruidTree:OnUpdateRosterButton(this)
 				end
 			</OnUpdate>
@@ -46,7 +46,7 @@
 		</Scripts>
     </Button>
 	
-	<!-- 名单框架 -->
+	<!-- 治疗名单框架 -->
 	<Frame name="DruidTreeRosterFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" hidden="true" parent="UIParent">
 		<Size>
 			<AbsDimension x="150" y="230" />
@@ -68,14 +68,14 @@
 		</Backdrop>
 		<Scripts>
             <OnLoad>
-                this.offset = 0
+                this.Offset = 0
             </OnLoad>
             <OnShow>
-                this.updateYourself = true
+                this.UpdateYourself = true
             </OnShow>
             <OnUpdate>
-				if this.updateYourself then
-					this.updateYourself = false
+				if this.UpdateYourself then
+					this.UpdateYourself = false
 					DruidTree:OnUpdateRosterFrame(this)
 				end
             </OnUpdate>
@@ -202,8 +202,8 @@
 						DruidTreeTooltip:Hide()
 					</OnLeave>
                     <OnClick>
-                        this:GetParent().offset = this:GetParent().offset - 1
-                        this:GetParent().updateYourself = true
+                        this:GetParent().Offset = this:GetParent().Offset - 1
+                        this:GetParent().UpdateYourself = true
                     </OnClick>
                 </Scripts>
             </Button>
@@ -231,8 +231,8 @@
 						DruidTreeTooltip:Hide()
 					</OnLeave>
                     <OnClick>
-                        this:GetParent().offset = this:GetParent().offset + 1
-                        this:GetParent().updateYourself = true
+                        this:GetParent().Offset = this:GetParent().Offset + 1
+                        this:GetParent().UpdateYourself = true
                     </OnClick>
                 </Scripts>
             </Button>

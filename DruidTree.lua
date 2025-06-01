@@ -451,7 +451,7 @@ function DruidTree:OnInitialize()
 				type = "toggle",
 				name = "调试模式",
 				desc = "开启或关闭调试模式",
-				order = 11,
+				order = 10,
 				get = "IsDebugging",
 				set = "SetDebugging"
 			},	
@@ -459,7 +459,7 @@ function DruidTree:OnInitialize()
 				type = "range",
 				name = "调试等级",
 				desc = "设置或获取调试等级",
-				order = 12,
+				order = 11,
 				min = 1,
 				max = 3,
 				step = 1,
@@ -508,7 +508,7 @@ end
 -- 到治疗单位
 ---@param unit? string 单位；缺省为（友善目标 > 自己）
 ---@return string unit 单位
-function DruidTree:ToUnit(unit)
+function DruidTree:ToHealUnit(unit)
 	-- 缺省单位
 	if not unit then
 		unit = UnitExists("target") and "target" or "player"
@@ -556,7 +556,7 @@ function DruidTree:AdaptRank(name, health, unit)
 
 	-- 最高等级
 	return name
-end
+end  
 
 -- 施放法术
 ---@param spell string 法术名称；可包含等级
@@ -694,10 +694,10 @@ function DruidTree:CanHeal(unit)
 end
 
 -- 过量治疗单位
----@param unit? string 目标单位；缺省为`self:ToUnit(unit)`
+---@param unit? string 目标单位；缺省为`self:ToHealUnit(unit)`
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:OverdoseHeal(unit)
-	unit = self:ToUnit(unit)
+	unit = self:ToHealUnit(unit)
 
 	-- 可否治疗
 	if not self:CanHeal(unit) then
@@ -724,11 +724,11 @@ end
 
 -- 尽力治疗单位
 ---@param start? number 起始损失百分比；缺省为`2`
----@param unit? string 目标单位；缺省为`self:ToUnit(unit)`
+---@param unit? string 目标单位；缺省为`self:ToHealUnit(unit)`
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:EndeavorHeal(start, unit)
 	start = start or 2
-	unit = self:ToUnit(unit)
+	unit = self:ToHealUnit(unit)
 
 	-- 可否治疗
 	if not self:CanHeal(unit) then
@@ -761,11 +761,11 @@ end
 
 -- 节省治疗单位
 ---@param start? number 起始损失百分比；缺省为`4`
----@param unit? string 目标单位；缺省为`self:ToUnit(unit)`
+---@param unit? string 目标单位；缺省为`self:ToHealUnit(unit)`
 ---@return boolean success 成功返回真，否则返回假
 function DruidTree:EconomizeHeal(start, unit)
 	start = start or 4
-	unit = self:ToUnit(unit)
+	unit = self:ToHealUnit(unit)
 
 	-- 可否治疗
 	if not self:CanHeal(unit) then
@@ -1019,18 +1019,18 @@ function DruidTree:OnUpdateRosterFrame(this)
 	local size = table.getn(self.db.profile.rosters)
 	if (size < 11) then
 		-- 不足多页
-		this.offset = 0
+		this.Offset = 0
 		UpButton:Hide()
 		DownButton:Hide()
 	else
-		if this.offset <= 0 then
+		if (this.Offset <= 0) then
 			-- 首页
-			this.offset = 0
+			this.Offset = 0
 			UpButton:Hide()
 			DownButton:Show()
-		elseif this.offset >= size - 10 then
+		elseif (this.Offset >= (size - 10)) then
 			-- 尾页
-			this.offset = size - 10
+			this.Offset = (size - 10)
 			UpButton:Show()
 			DownButton:Hide()
 		else
@@ -1042,9 +1042,9 @@ function DruidTree:OnUpdateRosterFrame(this)
 
 	for index = 1, 10 do
 		local RosterButton = getglobal(parentName .. "RosterButton" .. index)
-		RosterButton:SetID(index + this.offset)
-		RosterButton.updateYourself = true
-		if index <= size then
+		RosterButton:SetID(index + this.Offset)
+		RosterButton.UpdateYourself = true
+		if (index <= size) then
 			RosterButton:Show()
 		else
 			RosterButton:Hide()
@@ -1060,7 +1060,7 @@ function DruidTree:OnClickJoinButton(this)
 			Prompt:Warning("<%s>已在名单中", name)
 		else
 			table.insert(self.db.profile.rosters, name)
-			DruidTreeRosterFrame.updateYourself = true
+			DruidTreeRosterFrame.UpdateYourself = true
 			Prompt:Info("已将<%s>加入名单", name)
 		end
 	else
@@ -1071,7 +1071,7 @@ end
 -- 单击清空按钮
 function DruidTree:OnClickClearButton(this)
 	self.db.profile.rosters = {}
-	DruidTreeRosterFrame.updateYourself = true
+	DruidTreeRosterFrame.UpdateYourself = true
 	Prompt:Info("已清空名单")
 end
 
@@ -1101,7 +1101,7 @@ function DruidTree:OnClickRosterButton(this)
 	local name = self.db.profile.rosters[index]
 	if name then
 		table.remove(self.db.profile.rosters, index)
-		DruidTreeRosterFrame.updateYourself = true
+		DruidTreeRosterFrame.UpdateYourself = true
 		Prompt:Info("已将<%s>移出名单", name)
 	else
 		Prompt:Warning("名单索引<%d>异常", index)
