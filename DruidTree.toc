@@ -1,6 +1,6 @@
 ## Interface: 11200
 ## Title: DruidTree
-## Title-zhCN: |CFF33AAFF[Wsd]|R树德 v2.2.7
+## Title-zhCN: |CFF33AAFF[库巴]|R树德 v2.2.7
 ## Notes-zhCN: 适配乌龟服的树德辅助插件
 ## Author: 树先生 (xhwsd@qq.com)
 ## Version: 2.2.7
@@ -8,14 +8,14 @@
 ## OptionalDeps: AceLibrary, AceConsole-2.0, AceDebug-2.0, FuBarPlugin-2.0, Tablet-2.0, RosterLib-2.0
 ## SavedVariablesPerCharacter: DruidTreeDB
 
-Libs\Wsd-Array-1.0\Wsd-Array-1.0.lua
-Libs\Wsd-Buff-1.0\Wsd-Buff-1.0.lua
-Libs\Wsd-CastStatus-1.0\Wsd-CastStatus-1.0.lua 
-Libs\Wsd-Health-1.0\Wsd-Health-1.0.lua
-Libs\Wsd-Prompt-1.0\Wsd-Prompt-1.0.lua
-Libs\Wsd-Slot-1.0\Wsd-Slot-1.0.lua 
-Libs\Wsd-Spell-1.0\Wsd-Spell-1.0.lua 
-Libs\Wsd-Target-1.0\Wsd-Target-1.0.lua
+Libs\KuBa-Array-1.0\KuBa-Array-1.0.lua
+Libs\KuBa-Buff-1.0\KuBa-Buff-1.0.lua
+Libs\KuBa-CastStatus-1.0\WKuBasd-CastStatus-1.0.lua 
+Libs\KuBa-Health-1.0\KuBa-Health-1.0.lua
+Libs\KuBa-Prompt-1.0\KuBa-Prompt-1.0.lua
+Libs\KuBa-Slot-1.0\KuBa-Slot-1.0.lua 
+Libs\KuBa-Spell-1.0\KuBa-Spell-1.0.lua 
+Libs\KuBa-Target-1.0\KuBa-Target-1.0.lua
 
 DruidTree.lua
 DruidTree.xml

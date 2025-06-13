@@ -1,14 +1,14 @@
 --[[
-Name: Wsd-Target-1.0
+Name: KuBa-Target-1.0
 Revision: $Rev: 10001 $
 Author(s): 树先生 (xhwsd@qq.com)
-Website: https://github.com/xhwsd
+Website: https://gitee.com/ku-ba
 Description: 目标切换相关操作库。
 Dependencies: AceLibrary
 ]]
 
 -- 主要版本
-local MAJOR_VERSION = "Wsd-Target-1.0"
+local MAJOR_VERSION = "KuBa-Target-1.0"
 -- 次要版本
 local MINOR_VERSION = "$Revision: 10001 $"
 
@@ -23,7 +23,7 @@ if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then
 end
 
 -- 目标切换相关操作库。
----@class Wsd-Target-1.0
+---@class KuBa-Target-1.0
 local Library = {}
 
 -- 库激活

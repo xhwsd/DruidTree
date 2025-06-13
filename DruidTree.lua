@@ -21,22 +21,22 @@ local Tablet = AceLibrary("Tablet-2.0")
 -- 名单库（团队/队伍）
 local RosterLib = AceLibrary("RosterLib-2.0")
 
----@type Wsd-Array-1.0
-local Array = AceLibrary("Wsd-Array-1.0")
----@type Wsd-Buff-1.0
-local Buff = AceLibrary("Wsd-Buff-1.0")
----@type Wsd-CastStatus-1.0
-local CastStatus = AceLibrary("Wsd-CastStatus-1.0")
----@type Wsd-Health-1.0
-local Health = AceLibrary("Wsd-Health-1.0")
----@type Wsd-Prompt-1.0
-local Prompt = AceLibrary("Wsd-Prompt-1.0")
----@type Wsd-Slot-1.0
-local Slot = AceLibrary("Wsd-Slot-1.0")
----@type Wsd-Spell-1.0
-local Spell = AceLibrary("Wsd-Spell-1.0")
----@type Wsd-Target-1.0
-local Target = AceLibrary("Wsd-Target-1.0")
+---@type KuBa-Array-1.0
+local Array = AceLibrary("KuBa-Array-1.0")
+---@type KuBa-Buff-1.0
+local Buff = AceLibrary("KuBa-Buff-1.0")
+---@type KuBa-CastStatus-1.0
+local CastStatus = AceLibrary("KuBa-CastStatus-1.0")
+---@type KuBa-Health-1.0
+local Health = AceLibrary("KuBa-Health-1.0")
+---@type KuBa-Prompt-1.0
+local Prompt = AceLibrary("KuBa-Prompt-1.0")
+---@type KuBa-Slot-1.0
+local Slot = AceLibrary("KuBa-Slot-1.0")
+---@type KuBa-Spell-1.0
+local Spell = AceLibrary("KuBa-Spell-1.0")
+---@type KuBa-Target-1.0
+local Target = AceLibrary("KuBa-Target-1.0")
 
 -- 插件载入
 function DruidTree:OnInitialize()

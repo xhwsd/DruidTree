@@ -1,14 +1,14 @@
 --[[
-Name: Wsd-CastStatus-1.0
+Name: KuBa-CastStatus-1.0
 Revision: $Rev: 10001 $
 Author(s): 树先生 (xhwsd@qq.com)
-Website: https://github.com/xhwsd
+Website: https://gitee.com/ku-ba
 Description: 施法状态相关操作库。
 Dependencies: AceLibrary, AceEvent-2.0, AceHook-2.1, SpellCache-1.0, Gratuity-2.0
 ]]
 
 -- 主要版本
-local MAJOR_VERSION = "Wsd-CastStatus-1.0"
+local MAJOR_VERSION = "KuBa-CastStatus-1.0"
 -- 次要版本
 local MINOR_VERSION = "$Revision: 10001 $"
 
@@ -49,7 +49,7 @@ local SpellCache = AceLibrary("SpellCache-1.0")
 local Gratuity = AceLibrary("Gratuity-2.0")
 
 -- 施法状态相关操作库。
----@class Wsd-CastStatus-1.0
+---@class KuBa-CastStatus-1.0
 local Library = {}
 
 -- 库激活

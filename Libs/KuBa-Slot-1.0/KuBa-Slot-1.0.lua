@@ -1,14 +1,14 @@
 --[[
-Name: Wsd-Slot-1.0
+Name: KuBa-Slot-1.0
 Revision: $Rev: 10001 $
 Author(s): 树先生 (xhwsd@qq.com)
-Website: https://github.com/xhwsd
+Website: https://gitee.com/ku-ba
 Description: 法术插槽相关操作库。
 Dependencies: AceLibrary, Gratuity-2.0, SpellCache-1.0
 ]]
 
 -- 主要版本
-local MAJOR_VERSION = "Wsd-Slot-1.0"
+local MAJOR_VERSION = "KuBa-Slot-1.0"
 --次要版本
 local MINOR_VERSION = "$Revision: 10001 $"
 
@@ -44,7 +44,7 @@ local Gratuity = AceLibrary("Gratuity-2.0")
 local SpellCache = AceLibrary("SpellCache-1.0")
 
 -- 法术插槽相关操作库。
----@class Wsd-Slot-1.0
+---@class KuBa-Slot-1.0
 local Library = {}
 
 -- 库激活
