@@ -1,4 +1,6 @@
 # 树德辅助插件
+> 如有建议或BUG请至[ku-ba/DruidTree](https://gitee.com/ku-ba/DruidTree)代码库提交问题！
+
 
 ![功能预览](Preview.png)
 
