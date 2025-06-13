@@ -10,7 +10,7 @@
 
 Libs\KuBa-Array-1.0\KuBa-Array-1.0.lua
 Libs\KuBa-Buff-1.0\KuBa-Buff-1.0.lua
-Libs\KuBa-CastStatus-1.0\WKuBasd-CastStatus-1.0.lua 
+Libs\KuBa-CastStatus-1.0\KuBa-CastStatus-1.0.lua 
 Libs\KuBa-Health-1.0\KuBa-Health-1.0.lua
 Libs\KuBa-Prompt-1.0\KuBa-Prompt-1.0.lua
 Libs\KuBa-Slot-1.0\KuBa-Slot-1.0.lua 
