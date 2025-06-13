@@ -1,11 +1,11 @@
 # 树德辅助插件
-> 如有建议或BUG请至[ku-ba/DruidTree](https://gitee.com/ku-ba/DruidTree)代码库提交问题！
-
-
-![功能预览](Preview.png)
+> 如有建议或BUG请至[ku-ba/DruidTree](https://gitee.com/ku-ba/DruidTree)代码库[提交问题](https://gitee.com/ku-ba/DruidTree/issues)！
 
 
 ## 功能
+![功能预览](Preview.png)
+
+
 - 可视化设置
 - 无脑一键
 - 自定义治疗名单
